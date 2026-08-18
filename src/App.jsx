@@ -8,6 +8,7 @@ import FilterTabs from './components/FilterTabs.jsx';
 import HoldingsList from './components/HoldingsList.jsx';
 import MarketReport from './components/MarketReport.jsx';
 import GlobalNews from './components/GlobalNews.jsx';
+import TaiwanAINews from './components/TaiwanAINews.jsx';
 import { lastUpdate, reportDate, totalHoldings, holdings } from './data/mockData.js';
 
 function App() {
@@ -22,6 +23,8 @@ function App() {
           <MarketReport />
         ) : view === 'global' ? (
           <GlobalNews />
+        ) : view === 'ai' ? (
+          <TaiwanAINews />
         ) : (
           <>
             <p className="update-time">上次更新:{lastUpdate}</p>
