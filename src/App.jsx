@@ -7,6 +7,7 @@ import SummaryCards from './components/SummaryCards';
 import FilterTabs from './components/FilterTabs';
 import HoldingsList from './components/HoldingsList';
 import MarketReport from './components/MarketReport';
+import GlobalNews from './components/GlobalNews';
 import { lastUpdate, reportDate, totalHoldings, holdings } from './data/mockData';
 
 function App() {
@@ -19,6 +20,8 @@ function App() {
       <main className="container">
         {view === 'market' ? (
           <MarketReport />
+        ) : view === 'global' ? (
+          <GlobalNews />
         ) : (
           <>
             <p className="update-time">上次更新:{lastUpdate}</p>
