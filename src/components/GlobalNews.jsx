@@ -1,4 +1,9 @@
 export default function GlobalNews() {
+  const linkStyle = { color: 'var(--accent)', textDecoration: 'none' };
+  const A = ({ href, children }) => (
+    <a href={href} target="_blank" rel="noopener noreferrer" style={linkStyle}>{children}</a>
+  );
+
   return (
     <div className="market-report">
       <h1 className="main-title">國際財經頭條</h1>
@@ -6,23 +11,23 @@ export default function GlobalNews() {
 
       <section className="mr-section">
         <h2 className="mr-section-title">1. 全球財經頭條（三大媒體精選）</h2>
-        <p className="mr-note" style={{marginBottom:12}}>以下整理 CNN Business、Bloomberg、Fox Business 近期主要財經頭條（依公開報導彙整，實際以各媒體官網為準）。</p>
+        <p className="mr-note" style={{marginBottom:12}}>點擊標題可開啟原文（新分頁）。以下為 CNN Business、Bloomberg、Fox Business 近期主要財經頭條。</p>
 
         <h3 className="mr-sub">CNN Business</h3>
         <div className="mr-table-wrap">
           <table className="mr-table">
             <thead><tr><th style={{textAlign:'left'}}>標題</th><th>重點</th></tr></thead>
             <tbody>
-              <tr><td style={{textAlign:'left'}}>荷莫茲海峽石油實際流通量如何？</td><td>中東地緣風險</td></tr>
-              <tr><td style={{textAlign:'left'}}>川普政府稱石油已恢復正常流通，但問題仍在</td><td>油價／通膨</td></tr>
-              <tr><td style={{textAlign:'left'}}>Exxon 上季日賺 1.6 億美元，油價上揚受惠</td><td>能源股</td></tr>
-              <tr><td style={{textAlign:'left'}}>AI 財富推升舊金山房市「加價百萬」搶購潮</td><td>AI／房地產</td></tr>
-              <tr><td style={{textAlign:'left'}}>迪士尼樂園與郵輪兩年來最佳成長</td><td>消費／旅遊</td></tr>
-              <tr><td style={{textAlign:'left'}}>監管單位放行川普相關企業設銀行引爭議</td><td>金融監管</td></tr>
-              <tr><td style={{textAlign:'left'}}>水牛城 Bills 新球場票價與視野爭議</td><td>體育商業</td></tr>
-              <tr><td style={{textAlign:'left'}}>讀寫能力下降，科技能否解方？</td><td>科技／社會</td></tr>
-              <tr><td style={{textAlign:'left'}}>油價與中東談判僵局牽動市場情緒</td><td>全球市場</td></tr>
-              <tr><td style={{textAlign:'left'}}>企業 AI 內容氾濫，平台開始清理「AI 垃圾」</td><td>科技治理</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.cnn.com/2026/08/17/business/oil-market-strait-of-hormuz-trump">荷莫茲海峽石油實際流通量如何？</A></td><td>中東地緣風險</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.cnn.com/2026/08/17/business/oil-market-strait-of-hormuz-trump">川普政府稱石油已恢復正常流通，但問題仍在</A></td><td>油價／通膨</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.cnn.com/business">Exxon 上季日賺可觀，油價上揚受惠</A></td><td>能源股</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.cnn.com/2026/08/17/economy/sf-real-estate-ai-wealth">AI 財富推升舊金山房市「加價百萬」搶購潮</A></td><td>AI／房地產</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.cnn.com/business">迪士尼樂園與郵輪成長受關注</A></td><td>消費／旅遊</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.cnn.com/2026/08/17/investing/trump-crypto-bank-world-liberty">監管單位放行川普相關企業設銀行引爭議</A></td><td>金融監管</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.cnn.com/business">水牛城 Bills 新球場票價與視野爭議</A></td><td>體育商業</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.cnn.com/business">讀寫能力下降，科技能否解方？</A></td><td>科技／社會</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.cnn.com/2026/08/17/business/oil-market-strait-of-hormuz-trump">油價與中東談判僵局牽動市場情緒</A></td><td>全球市場</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.cnn.com/business">企業 AI 內容氾濫，平台開始清理「AI 垃圾」</A></td><td>科技治理</td></tr>
             </tbody>
           </table>
         </div>
@@ -32,16 +37,16 @@ export default function GlobalNews() {
           <table className="mr-table">
             <thead><tr><th style={{textAlign:'left'}}>標題</th><th>重點</th></tr></thead>
             <tbody>
-              <tr><td style={{textAlign:'left'}}>亞股承壓、油價續漲：中東僵局與通膨疑慮</td><td>亞洲／油價</td></tr>
-              <tr><td style={{textAlign:'left'}}>美股收跌後，亞太期指偏空開盤</td><td>全球連動</td></tr>
-              <tr><td style={{textAlign:'left'}}>Anthropic 營收暴增，晶片股獲支撐</td><td>AI／半導體</td></tr>
-              <tr><td style={{textAlign:'left'}}>美伊 60 日備忘錄到期，談判希望淡化</td><td>地緣政治</td></tr>
-              <tr><td style={{textAlign:'left'}}>公債殖利率攀升，30 年期創多年高</td><td>債券／利率</td></tr>
-              <tr><td style={{textAlign:'left'}}>科技股受 AI 信心提振，但大盤仍收黑</td><td>美股結構</td></tr>
-              <tr><td style={{textAlign:'left'}}>美元走弱，聯準會升息押注降溫</td><td>匯市／Fed</td></tr>
-              <tr><td style={{textAlign:'left'}}>以色列與真主黨衝突再起，中東風險升溫</td><td>地緣</td></tr>
-              <tr><td style={{textAlign:'left'}}>WTI 原油月內高點，通膨壓力再現</td><td>能源</td></tr>
-              <tr><td style={{textAlign:'left'}}>零售財報周將至，市場觀望消費力道</td><td>財報／消費</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.bloomberg.com/news/articles/2026-08-17/stock-market-today-dow-s-p-live-updates">亞股承壓、油價續漲：中東僵局與通膨疑慮</A></td><td>亞洲／油價</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.bloomberg.com/news/articles/2026-08-17/stock-market-today-dow-s-p-live-updates">美股收跌後，亞太期指偏空開盤</A></td><td>全球連動</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.bloomberg.com/news/articles/2026-08-14/anthropic-revenue-ahead-of-ipo-surges-over-14-fold-in-second-quarter">Anthropic 營收暴增，晶片股獲支撐</A></td><td>AI／半導體</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.bloomberg.com/news/articles/2026-08-17/stock-market-today-dow-s-p-live-updates">美伊 60 日備忘錄到期，談判希望淡化</A></td><td>地緣政治</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.bloomberg.com/news/videos/2026-08-17/the-close-8-17-2026-video">公債殖利率攀升，30 年期創多年高</A></td><td>債券／利率</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.bloomberg.com/news/articles/2026-08-14/anthropic-revenue-ahead-of-ipo-surges-over-14-fold-in-second-quarter">科技股受 AI 信心提振，但大盤仍收黑</A></td><td>美股結構</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.bloomberg.com/">美元走弱，聯準會升息押注降溫</A></td><td>匯市／Fed</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.bloomberg.com/news/articles/2026-08-17/stock-market-today-dow-s-p-live-updates">以色列與真主黨衝突再起，中東風險升溫</A></td><td>地緣</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.bloomberg.com/news/videos/2026-08-17/the-close-8-17-2026-video">WTI 原油月內高點，通膨壓力再現</A></td><td>能源</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.bloomberg.com/news/articles/2026-08-17/stock-market-today-dow-s-p-live-updates">零售財報周將至，市場觀望消費力道</A></td><td>財報／消費</td></tr>
             </tbody>
           </table>
         </div>
@@ -51,16 +56,16 @@ export default function GlobalNews() {
           <table className="mr-table">
             <thead><tr><th style={{textAlign:'left'}}>標題</th><th>重點</th></tr></thead>
             <tbody>
-              <tr><td style={{textAlign:'left'}}>川普：美伊備忘錄到期，美方條件未獲滿足</td><td>美伊談判</td></tr>
-              <tr><td style={{textAlign:'left'}}>油價與油氣成本政治效應升溫</td><td>能源政治</td></tr>
-              <tr><td style={{textAlign:'left'}}>L3Harris 因行為調查撤換執行長</td><td>企業治理</td></tr>
-              <tr><td style={{textAlign:'left'}}>Russell 2000 再創高，小型股走強</td><td>美股結構</td></tr>
-              <tr><td style={{textAlign:'left'}}>大科技資本支出持續支撐經濟</td><td>AI 基建</td></tr>
-              <tr><td style={{textAlign:'left'}}>零售財報前夕，消費信心與通膨受關注</td><td>消費</td></tr>
-              <tr><td style={{textAlign:'left'}}>能源部推動美國石油自動化增產</td><td>能源政策</td></tr>
-              <tr><td style={{textAlign:'left'}}>Stellantis 近百萬輛車召回（相機軟體）</td><td>汽車</td></tr>
-              <tr><td style={{textAlign:'left'}}>國債規模與財政負擔持續擴大</td><td>財政</td></tr>
-              <tr><td style={{textAlign:'left'}}>Meta 面臨社群成癮訴訟，可能天價求償</td><td>科技監管</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.foxbusiness.com/category/markets">川普：美伊備忘錄到期，美方條件未獲滿足</A></td><td>美伊談判</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.foxbusiness.com/category/markets">油價與油氣成本政治效應升溫</A></td><td>能源政治</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.foxbusiness.com/markets/l3harris-ousts-ceo-kubasik-over-conduct-violation">L3Harris 因行為調查撤換執行長</A></td><td>企業治理</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.foxbusiness.com/category/markets">Russell 2000 再創高，小型股走強</A></td><td>美股結構</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.foxbusiness.com/category/markets">大科技資本支出持續支撐經濟</A></td><td>AI 基建</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.foxbusiness.com/category/markets">零售財報前夕，消費信心與通膨受關注</A></td><td>消費</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.foxbusiness.com/category/markets">能源部推動美國石油自動化增產</A></td><td>能源政策</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.foxbusiness.com/">Stellantis 近百萬輛車召回（相機軟體）</A></td><td>汽車</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.foxbusiness.com/category/markets">國債規模與財政負擔持續擴大</A></td><td>財政</td></tr>
+              <tr><td style={{textAlign:'left'}}><A href="https://www.foxbusiness.com/">Meta 面臨社群成癮訴訟，可能天價求償</A></td><td>科技監管</td></tr>
             </tbody>
           </table>
         </div>
@@ -79,13 +84,13 @@ export default function GlobalNews() {
         </p>
         <p className="mr-note" style={{marginBottom:12}}>
           <strong>主要驅動因素：</strong><br/>
-          1. <strong>地緣政治</strong>：美伊 60 日備忘錄到期、談判僵局；川普對阿曼相關表態推升油價與風險溢價。<br/>
+          1. <strong>地緣政治</strong>：美伊 60 日備忘錄到期、談判僵局；油價與風險溢價上升。<br/>
           2. <strong>油價與公債</strong>：WTI 上漲約 2%～2.6%，30 年期美債殖利率升至 2007 年以來高點，壓抑成長股與消費股評價。<br/>
-          3. <strong>AI 對沖力道</strong>：Anthropic 初步季營收強勁（約年增十倍以上），帶動記憶體／晶片股（如 SanDisk 大漲），費半收紅。<br/>
+          3. <strong>AI 對沖力道</strong>：Anthropic 初步季營收強勁，帶動記憶體／晶片股，費半收紅。<br/>
           4. <strong>個股拖累</strong>：Nike 重挫（道瓊權值）、部分通訊與軟體股走弱；航空股受燃油成本疑慮下跌。
         </p>
         <p className="mr-note">
-          <strong>領漲／領跌：</strong>領漲偏向能源、部分半導體與 AI 供應鏈；領跌為通訊服務、消費必需品、部分零售與航空。代表性個股：SanDisk 大漲、Nike／Meta 走弱。
+          <strong>領漲／領跌：</strong>領漲偏向能源、部分半導體與 AI 供應鏈；領跌為通訊服務、消費必需品、部分零售與航空。
         </p>
       </section>
 
@@ -93,14 +98,13 @@ export default function GlobalNews() {
         <h2 className="mr-section-title">3. 對台北股市的影響評估</h2>
         <p className="mr-note" style={{marginBottom:12}}>
           <strong>產業連動路徑：</strong><br/>
-          • <strong>半導體／AI</strong>：美股費半收紅、Anthropic 等 AI 營收亮眼 → 有利台積電、智原、材料-KY、中信關鍵半導體等供應鏈評價。<br/>
-          • <strong>科技／ODM</strong>：Nasdaq 僅小跌、AI 資本支出題材延續 → 廣達、技嘉、英業達等伺服器／筆電相關仍具支撐，但若美債殖利率續升，評價面壓力仍在。<br/>
-          • <strong>金融</strong>：美債殖利率走高、全球風險偏好降溫 → 台股金融股（中信金、玉山金、凱基金等）可能震盪，利差與資本利得看法分歧。<br/>
-          • <strong>航運／原物料</strong>：油價上漲對長榮等有雙面影響（運價 vs 成本）；中東風險若升高，避險情緒可能壓抑週期股。
+          • <strong>半導體／AI</strong>：美股費半收紅、AI 營收亮眼 → 有利台積電、智原、材料-KY、中信關鍵半導體等。<br/>
+          • <strong>科技／ODM</strong>：Nasdaq 僅小跌、AI 資本支出題材延續 → 廣達、技嘉、英業達等仍具支撐。<br/>
+          • <strong>金融</strong>：美債殖利率走高 → 中信金、玉山金、凱基金等可能震盪。<br/>
+          • <strong>航運</strong>：油價上漲對長榮有雙面影響。
         </p>
         <p className="mr-note" style={{marginBottom:12}}>
-          <strong>台指期與開盤預估（僅供參考）：</strong><br/>
-          美股小跌但費半收紅，且台股 8/17 已收紅，預期今日（8/18）加權指數開盤偏<strong>平盤附近震盪至小幅低開</strong>，若半導體權值穩定，盤中仍有機會守穩前收附近。需緊盯油價、美債殖利率及權值股早盤量價。
+          <strong>開盤預估（僅供參考）：</strong>美股小跌但費半收紅，預期加權指數開盤偏平盤附近震盪至小幅低開，若半導體權值穩定，盤中仍有機會守穩前收附近。
         </p>
         <h3 className="mr-sub">受美股影響較大的相關持股</h3>
         <div className="mr-table-wrap">
@@ -117,7 +121,7 @@ export default function GlobalNews() {
             </tbody>
           </table>
         </div>
-        <p className="mr-note">※ 以上為依公開市場資訊之綜合評估，非投資建議。請以即時報價與個人風險承受度為準。</p>
+        <p className="mr-note">※ 以上為依公開市場資訊之綜合評估，非投資建議。</p>
       </section>
     </div>
   );
