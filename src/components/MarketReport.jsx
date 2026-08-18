@@ -13,13 +13,12 @@ const technicalOverview={note:'依 2026-08-18 技術分析綜合評估',columns:
 {name:'統一台灣高息動能',score:'1'},{name:'凱基金',score:'1'},{name:'技嘉',score:'1'},
 {name:'大華優利高填息',score:'1'}
 ]},
-{id:'watch',title:'觀望 (17)',color:'yellow',items:[
-{name:'中鴻',score:'0.9'},{name:'三商壽',score:'0.7'},{name:'國票金',score:'0.5'},
-{name:'技宸',score:'0.4'},{name:'華票',score:'0.3'},{name:'群益台灣精選高息',score:'0.3'},
-{name:'福邦證',score:'0.2'},{name:'復華台灣科技優息',score:'0'},
-{name:'元大台灣價值高息',score:'-0.1'},{name:'英業達',score:'-0.1'},{name:'中信金',score:'-0.1'},
-{name:'海悅',score:'-0.3'},{name:'原相',score:'-0.3'},{name:'主動野村台灣優選',score:'-0.3'},
-{name:'中信關鍵半導體',score:'-0.3'},{name:'群益ESG投等債20+',score:'-0.7'},{name:'群益證',score:'-0.8'}
+{id:'watch',title:'觀望 (17)',color:'yellow',grouped:true,groups:[
+{industry:'金融／保險',items:[{name:'三商壽',score:'0.7'},{name:'國票金',score:'0.5'},{name:'華票',score:'0.3'},{name:'福邦證',score:'0.2'},{name:'中信金',score:'-0.1'},{name:'群益證',score:'-0.8'}]},
+{industry:'鋼鐵',items:[{name:'中鴻',score:'0.9'}]},
+{industry:'電子／半導體',items:[{name:'技宸',score:'0.4'},{name:'英業達',score:'-0.1'},{name:'原相',score:'-0.3'}]},
+{industry:'營建',items:[{name:'海悅',score:'-0.3'}]},
+{industry:'ETF／基金',items:[{name:'群益台灣精選高息',score:'0.3'},{name:'復華台灣科技優息',score:'0'},{name:'元大台灣價值高息',score:'-0.1'},{name:'主動野村台灣優選',score:'-0.3'},{name:'中信關鍵半導體',score:'-0.3'},{name:'群益ESG投等債20+',score:'-0.7'}]}
 ]},
 {id:'reduce',title:'減碼 (1)',color:'red',items:[{name:'中信中國高股息',score:'-1'}]}
 ]};
@@ -62,7 +61,33 @@ export default function MarketReport() {
       <section className="mr-section">
         <h2 className="mr-section-title">4. 持股技術面總覽</h2>
         <p className="mr-note">{technicalOverview.note}</p>
-        <div className="mr-tech-grid">{technicalOverview.columns.map(col=><div key={col.id} className={`mr-tech-col ${col.color}`}><div className="mr-tech-head">{col.title}</div>{col.items.map(item=><div key={item.name} className="mr-tech-item"><span>{item.name}</span><span className="score">{item.score}</span></div>)}</div>)}</div>
+        <div className="mr-tech-grid">
+          {technicalOverview.columns.map(col => (
+            <div key={col.id} className={`mr-tech-col ${col.color}`}>
+              <div className="mr-tech-head">{col.title}</div>
+              {col.grouped ? (
+                col.groups.map(g => (
+                  <div key={g.industry} className="mr-tech-group">
+                    <div className="mr-tech-industry">{g.industry}</div>
+                    {g.items.map(item => (
+                      <div key={item.name} className="mr-tech-item">
+                        <span>{item.name}</span>
+                        <span className="score">{item.score}</span>
+                      </div>
+                    ))}
+                  </div>
+                ))
+              ) : (
+                col.items.map(item => (
+                  <div key={item.name} className="mr-tech-item">
+                    <span>{item.name}</span>
+                    <span className="score">{item.score}</span>
+                  </div>
+                ))
+              )}
+            </div>
+          ))}
+        </div>
       </section>
     </div>
   );
