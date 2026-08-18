@@ -9,6 +9,7 @@ import HoldingsList from './components/HoldingsList.jsx';
 import MarketReport from './components/MarketReport.jsx';
 import GlobalNews from './components/GlobalNews.jsx';
 import TaiwanAINews from './components/TaiwanAINews.jsx';
+import PortfolioPnL from './components/PortfolioPnL.jsx';
 import { lastUpdate, reportDate, totalHoldings, holdings } from './data/mockData.js';
 
 function App() {
@@ -25,6 +26,8 @@ function App() {
           <GlobalNews />
         ) : view === 'ai' ? (
           <TaiwanAINews />
+        ) : view === 'pnl' ? (
+          <PortfolioPnL />
         ) : (
           <>
             <p className="update-time">上次更新:{lastUpdate}</p>
