@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import TopNav from './components/TopNav';
-import IndexCards from './components/IndexCards';
-import UsMarkets from './components/UsMarkets';
-import LightStats from './components/LightStats';
-import SummaryCards from './components/SummaryCards';
-import FilterTabs from './components/FilterTabs';
-import HoldingsList from './components/HoldingsList';
-import MarketReport from './components/MarketReport';
-import GlobalNews from './components/GlobalNews';
-import { lastUpdate, reportDate, totalHoldings, holdings } from './data/mockData';
+import TopNav from './components/TopNav.jsx';
+import IndexCards from './components/IndexCards.jsx';
+import UsMarkets from './components/UsMarkets.jsx';
+import LightStats from './components/LightStats.jsx';
+import SummaryCards from './components/SummaryCards.jsx';
+import FilterTabs from './components/FilterTabs.jsx';
+import HoldingsList from './components/HoldingsList.jsx';
+import MarketReport from './components/MarketReport.jsx';
+import GlobalNews from './components/GlobalNews.jsx';
+import { lastUpdate, reportDate, totalHoldings, holdings } from './data/mockData.js';
 
 function App() {
   const [filter, setFilter] = useState('all');
