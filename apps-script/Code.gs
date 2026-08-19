@@ -1,8 +1,6 @@
 /**
- * Grok 交易紀錄寫入 Sheet
- * 寫入位置：目前「可見」且有資料的最後一列下方（略過隱藏列與預填空列）
- *
- * 更新後請：儲存 → 部署 → 管理部署 → 新版本 → 部署
+ * Grok 交易紀錄寫入 Sheet (v5)
+ * 寫在「可見且有資料」的最後一列下方
  */
 
 var SPREADSHEET_ID = '14ZGEQp3AkQIPx2fOEUyZy11sNpEr4mhGkP6Ei3RNs4w';
@@ -10,22 +8,13 @@ var SHEET_NAME = '交易紀錄';
 
 function testListSheets() {
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  var names = ss.getSheets().map(function (s) {
-    return s.getName();
-  });
-  Logger.log(names.join(' | '));
-  return names;
+  Logger.log(ss.getSheets().map(function (s) { return s.getName(); }).join(' | '));
 }
 
 function testAppend() {
   var result = appendTrade_({
-    code: 'TEST',
-    name: '測試',
-    type: 'buy',
-    date: '2026-08-19',
-    shares: 1,
-    price: 1,
-    reason: 'editor-test',
+    code: 'TEST', name: '測試', type: 'buy',
+    date: '2026-08-19', shares: 1, price: 1, reason: 'editor-test',
   });
   Logger.log(JSON.stringify(result));
   return result;
@@ -33,12 +22,9 @@ function testAppend() {
 
 function getTargetSheet_() {
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  var sheet = ss.getSheetByName(SHEET_NAME);
-  if (sheet) return sheet;
-  sheet =
-    ss.getSheetByName('交易明細') ||
-    ss.getSheetByName('交易記錄') ||
-    ss.getSheetByName('交易记录');
+  var sheet = ss.getSheetByName(SHEET_NAME)
+    || ss.getSheetByName('交易明細')
+    || ss.getSheetByName('交易記錄');
   if (sheet) return sheet;
   sheet = ss.insertSheet(SHEET_NAME);
   sheet.appendRow([
@@ -50,26 +36,31 @@ function getTargetSheet_() {
   return sheet;
 }
 
-/** 最後一列「可見 + 有實際交易資料」的列號（略過隱藏列、只有 0.6 的預填空列） */
+/** 只掃前 500 列或有內容的範圍，且只在「有資料」的列檢查隱藏 */
 function findLastVisibleDataRow_(sheet) {
   var last = sheet.getLastRow();
   if (last < 2) return 1;
-  // A 交易編號, B 交易日期, D 代號
-  var values = sheet.getRange(1, 1, last, 4).getValues();
-  for (var r = last; r >= 2; r--) {
-    if (sheet.isRowHiddenByUser(r)) continue;
+  // 限制掃描上限，避免預填公式列導致超時
+  var scanTo = Math.min(last, 500);
+  var values = sheet.getRange(1, 1, scanTo, 4).getValues();
+  for (var r = scanTo; r >= 2; r--) {
     var a = values[r - 1][0];
     var b = values[r - 1][1];
     var d = values[r - 1][3];
-    var hasA = a !== '' && a != null;
-    var hasB = b !== '' && b != null;
-    var hasD = d !== '' && d != null;
-    if (hasA || hasB || hasD) return r;
+    if (a === '' || a == null) {
+      if (b === '' || b == null) {
+        if (d === '' || d == null) continue;
+      }
+    }
+    // 有資料才檢查是否隱藏
+    try {
+      if (sheet.isRowHiddenByUser(r)) continue;
+    } catch (e) {}
+    return r;
   }
   return 1;
 }
 
-/** 下一個交易編號 = 既有編號最大值 + 1 */
 function nextTradeId_(sheet, upToRow) {
   if (upToRow < 2) return 1;
   var ids = sheet.getRange(2, 1, upToRow, 1).getValues();
@@ -88,17 +79,7 @@ function appendTrade_(data) {
   var insertRow = lastData + 1;
   var tradeId = nextTradeId_(sheet, lastData);
 
-  // 若插入位置已被隱藏，往下找第一個可見列
-  while (insertRow <= sheet.getMaxRows() && sheet.isRowHiddenByUser(insertRow)) {
-    insertRow++;
-  }
-
-  var typeMap = {
-    buy: '買',
-    sell: '賣',
-    cash_div: '股利',
-    stock_div: '股利',
-  };
+  var typeMap = { buy: '買', sell: '賣', cash_div: '股利', stock_div: '股利' };
   var typeLabel = typeMap[data.type] || String(data.type || '');
   var tradeClass = data.tradeClass || '一般';
   var fee = Number(data.fee) || 0;
@@ -126,38 +107,14 @@ function appendTrade_(data) {
   }
 
   var row = [
-    tradeId,
-    data.date || '',
-    typeLabel,
-    String(data.code || ''),
-    data.name || '',
-    tradeClass,
-    buyShares,
-    buyPrice,
-    sellShares,
-    sellPrice,
-    '',
-    fee,
-    fee,
-    Number(data.tax) || 0,
-    '',
-    fee,
-    expense,
-    income,
-    '',
-    data.reason || '',
-    data.feeDiscount != null ? data.feeDiscount : 0.6,
+    tradeId, data.date || '', typeLabel, String(data.code || ''), data.name || '', tradeClass,
+    buyShares, buyPrice, sellShares, sellPrice, '',
+    fee, fee, Number(data.tax) || 0, '', fee, expense, income, '',
+    data.reason || '', data.feeDiscount != null ? data.feeDiscount : 0.6,
   ];
 
-  // 寫入「可見最後一筆」的下一列（不使用 appendRow，避免跳到預填區最底）
   sheet.getRange(insertRow, 1, 1, row.length).setValues([row]);
-
-  return {
-    ok: true,
-    id: tradeId,
-    row: insertRow,
-    sheet: sheet.getName(),
-  };
+  return { ok: true, id: tradeId, row: insertRow, sheet: sheet.getName() };
 }
 
 function doGet(e) {
@@ -170,7 +127,7 @@ function doGet(e) {
       ok: true,
       service: 'grok-trade-log',
       target: SHEET_NAME,
-      version: 4,
+      version: 5,
       note: 'insert below last visible data row',
     });
   } catch (err) {
@@ -181,13 +138,9 @@ function doGet(e) {
 function doPost(e) {
   try {
     var data;
-    if (e && e.postData && e.postData.contents) {
-      data = JSON.parse(e.postData.contents);
-    } else if (e && e.parameter && e.parameter.payload) {
-      data = JSON.parse(e.parameter.payload);
-    } else {
-      throw new Error('no payload');
-    }
+    if (e && e.postData && e.postData.contents) data = JSON.parse(e.postData.contents);
+    else if (e && e.parameter && e.parameter.payload) data = JSON.parse(e.parameter.payload);
+    else throw new Error('no payload');
     return json_(appendTrade_(data));
   } catch (err) {
     return json_({ ok: false, error: String(err) });
@@ -195,7 +148,5 @@ function doPost(e) {
 }
 
 function json_(obj) {
-  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(
-    ContentService.MimeType.JSON
-  );
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
 }
