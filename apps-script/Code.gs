@@ -1,40 +1,90 @@
 /**
- * Grok 每日報告 — 新增交易紀錄寫入 Google Sheet
- *
- * 設定：
- * 1. 貼上本檔 → 儲存
- * 2. 部署 → 管理部署 → 編輯 → 版本選「新版本」→ 部署
- *    （執行身分：我 / 存取權：任何人）
- *
- * 寫入方式：GET ?action=append&payload=<URL-encoded JSON>
+ * Grok 交易紀錄寫入 Sheet
+ * 1. 貼上 → 儲存
+ * 2. 先執行 testListSheets（授權）
+ * 3. 部署 → 新增部署 → 網頁應用程式 → 任何人
  */
 
 var SPREADSHEET_ID = '14ZGEQp3AkQIPx2fOEUyZy11sNpEr4mhGkP6Ei3RNs4w';
-var SHEET_GID = 593571516; // 備用：找不到名稱時用 gid
-var SHEET_NAME = '交易紀錄'; // 寫入此分頁
+var SHEET_NAME = '交易紀錄';
+
+/** 在編輯器執行這個：授權 + 列出所有分頁名稱 */
+function testListSheets() {
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  var names = ss.getSheets().map(function (s) {
+    return s.getName();
+  });
+  Logger.log(names.join(' | '));
+  return names;
+}
+
+/** 在編輯器執行：測試寫入一列到「交易紀錄」 */
+function testAppend() {
+  var result = appendTrade_({
+    code: 'TEST',
+    name: '測試',
+    type: 'buy',
+    date: '2026-08-19',
+    shares: 1,
+    price: 1,
+    reason: 'editor-test',
+  });
+  Logger.log(JSON.stringify(result));
+  return result;
+}
 
 function getTargetSheet_() {
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  if (SHEET_NAME) {
-    var byName = ss.getSheetByName(SHEET_NAME);
-    if (byName) return byName;
-    // 若找不到「交易紀錄」，嘗試常見別名
-    var alt = ss.getSheetByName('交易明細') || ss.getSheetByName('交易記錄');
-    if (alt) return alt;
-  }
-  var sheets = ss.getSheets();
-  for (var i = 0; i < sheets.length; i++) {
-    if (sheets[i].getSheetId() == SHEET_GID) return sheets[i];
-  }
-  return ss.getSheets()[0];
+  var sheet = ss.getSheetByName(SHEET_NAME);
+  if (sheet) return sheet;
+
+  // 常見別名
+  sheet =
+    ss.getSheetByName('交易明細') ||
+    ss.getSheetByName('交易記錄') ||
+    ss.getSheetByName('交易记录');
+  if (sheet) return sheet;
+
+  // 沒有就新建「交易紀錄」並寫表頭
+  sheet = ss.insertSheet(SHEET_NAME);
+  sheet.appendRow([
+    '交易編號',
+    '交易日期',
+    '買/賣/股利',
+    '代號',
+    '股票',
+    '交易類別',
+    '買入股數',
+    '買入價格',
+    '賣出股數',
+    '賣出價格',
+    '現價',
+    '手續費',
+    '折讓後手續費',
+    '交易稅',
+    '成交價金',
+    '交易成本',
+    '支出',
+    '收入',
+    '買入比現價高',
+    '決策原因',
+    '手續費折數',
+  ]);
+  return sheet;
 }
 
 function appendTrade_(data) {
+  data = data || {};
   var sheet = getTargetSheet_();
   var nextId = sheet.getLastRow();
 
-  var typeMap = { buy: '買', sell: '賣', cash_div: '股利', stock_div: '股利' };
-  var typeLabel = typeMap[data.type] || data.type || '';
+  var typeMap = {
+    buy: '買',
+    sell: '賣',
+    cash_div: '股利',
+    stock_div: '股利',
+  };
+  var typeLabel = typeMap[data.type] || String(data.type || '');
   var tradeClass = data.tradeClass || '一般';
   var fee = Number(data.fee) || 0;
 
@@ -60,17 +110,17 @@ function appendTrade_(data) {
     buyPrice = 0;
   }
 
-  var row = [
+  sheet.appendRow([
     nextId,
     data.date || '',
     typeLabel,
     String(data.code || ''),
     data.name || '',
     tradeClass,
-    buyShares === '' ? '' : buyShares,
-    buyPrice === '' ? '' : buyPrice,
-    sellShares === '' ? '' : sellShares,
-    sellPrice === '' ? '' : sellPrice,
+    buyShares,
+    buyPrice,
+    sellShares,
+    sellPrice,
     '',
     fee,
     fee,
@@ -81,25 +131,24 @@ function appendTrade_(data) {
     income,
     '',
     data.reason || '',
-    data.feeDiscount != null ? data.feeDiscount : 0.6
-  ];
+    data.feeDiscount != null ? data.feeDiscount : 0.6,
+  ]);
 
-  sheet.appendRow(row);
   return { ok: true, id: nextId, sheet: sheet.getName() };
 }
 
 function doGet(e) {
   try {
-    e = e || { parameter: {} };
-    var p = e.parameter || {};
-
+    var p = e && e.parameter ? e.parameter : {};
     if (p.action === 'append' && p.payload) {
-      var data = JSON.parse(p.payload);
-      var result = appendTrade_(data);
-      return json_(result);
+      return json_(appendTrade_(JSON.parse(p.payload)));
     }
-
-    return json_({ ok: true, service: 'grok-trade-log', target: SHEET_NAME, hint: 'use ?action=append&payload=JSON' });
+    return json_({
+      ok: true,
+      service: 'grok-trade-log',
+      target: SHEET_NAME,
+      version: 3,
+    });
   } catch (err) {
     return json_({ ok: false, error: String(err) });
   }
@@ -108,17 +157,9 @@ function doGet(e) {
 function doPost(e) {
   try {
     var data;
-    if (e.postData && e.postData.contents) {
-      try {
-        data = JSON.parse(e.postData.contents);
-      } catch (err1) {
-        if (e.parameter && e.parameter.payload) {
-          data = JSON.parse(e.parameter.payload);
-        } else {
-          throw err1;
-        }
-      }
-    } else if (e.parameter && e.parameter.payload) {
+    if (e && e.postData && e.postData.contents) {
+      data = JSON.parse(e.postData.contents);
+    } else if (e && e.parameter && e.parameter.payload) {
       data = JSON.parse(e.parameter.payload);
     } else {
       throw new Error('no payload');
@@ -130,7 +171,7 @@ function doPost(e) {
 }
 
 function json_(obj) {
-  return ContentService
-    .createTextOutput(JSON.stringify(obj))
-    .setMimeType(ContentService.MimeType.JSON);
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(
+    ContentService.MimeType.JSON
+  );
 }
