@@ -76,13 +76,17 @@ export default function AddTrade() {
       } catch {
         result = null;
       }
-      if (result && result.ok) {
+
+      // 舊版腳本只回 {ok:true, service:...}，沒有 id → 其實沒寫入
+      if (result && result.ok && (result.id != null || result.sheet)) {
         setMsg(`已寫入 Google Sheet（列編號 ${result.id}${result.sheet ? '／分頁 ' + result.sheet : ''}）`);
         setShares('');
         setPrice('');
         setReason('');
+      } else if (result && result.ok && result.service) {
+        setMsg('腳本仍是舊版，尚未寫入 Sheet。請在 Apps Script 貼上新版 Code.gs → 儲存 → 部署「新版本」（或新增部署），完成後再試。');
       } else {
-        setMsg('送出失敗：' + (result?.error || text.slice(0, 160) || '未知錯誤。若尚未更新 Apps Script，請貼上新版 Code.gs 並重新部署。'));
+        setMsg('送出失敗：' + (result?.error || text.slice(0, 160) || '未知錯誤'));
       }
     } catch (err) {
       setMsg('送出失敗：' + (err?.message || String(err)));
@@ -159,7 +163,7 @@ export default function AddTrade() {
         <textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} style={{ ...inputStyle, resize: 'vertical', minHeight: 72 }} />
 
         {msg && (
-          <p className="mr-note" style={{ marginTop: 12, color: msg.includes('失敗') || msg.includes('尚未') ? '#f87171' : 'var(--teal, #14b8a6)' }}>
+          <p className="mr-note" style={{ marginTop: 12, color: msg.includes('失敗') || msg.includes('舊版') || msg.includes('尚未') ? '#f87171' : 'var(--teal, #14b8a6)' }}>
             {msg}
           </p>
         )}
