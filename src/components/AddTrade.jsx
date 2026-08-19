@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { SHEETS_WEBAPP_URL } from '../config.js';
+import { lookupStockName } from '../data/stockMap.js';
 
 const TYPES = [
   { id: 'buy', label: '買' },
@@ -43,23 +44,24 @@ export default function AddTrade() {
       return;
     }
     if (!configured) {
-      setMsg('尚未設定 Google Apps Script 網址，請先完成 Sheet 串接');
+      setMsg('尚未設定 Google Apps Script 網址');
       return;
     }
 
+    const resolvedName = name.trim() || lookupStockName(code);
     const payload = {
       code: code.trim(),
-      name: name.trim(),
+      name: resolvedName,
       type,
       date,
       shares: shares === '' ? null : Number(shares),
       price: price === '' ? null : Number(price),
       reason: reason.trim(),
-      tradeClass: code.trim().length >= 4 && code.trim().startsWith('00') ? 'ETF' : '一般',
+      tradeClass: /^00|\d{4}[A-Za-z]|[A-Za-z]/.test(code.trim()) ? 'ETF' : '一般',
     };
 
     setLoading(true);
-    setMsg('');
+    setMsg('送出中…');
     try {
       const qs = new URLSearchParams({
         action: 'append',
@@ -77,14 +79,13 @@ export default function AddTrade() {
         result = null;
       }
 
-      // 舊版腳本只回 {ok:true, service:...}，沒有 id → 其實沒寫入
       if (result && result.ok && (result.id != null || result.sheet)) {
-        setMsg(`已寫入 Google Sheet（列編號 ${result.id}${result.sheet ? '／分頁 ' + result.sheet : ''}）`);
+        setMsg(`已寫入 Google Sheet（列編號 ${result.id}／分頁 ${result.sheet || '交易紀錄'}${result.name ? '／' + result.name : ''}）`);
         setShares('');
         setPrice('');
         setReason('');
       } else if (result && result.ok && result.service) {
-        setMsg('腳本仍是舊版，尚未寫入 Sheet。請在 Apps Script 貼上新版 Code.gs → 儲存 → 部署「新版本」（或新增部署），完成後再試。');
+        setMsg('腳本仍是舊版。請更新 Code.gs 並部署新版本（需 version: 8）。');
       } else {
         setMsg('送出失敗：' + (result?.error || text.slice(0, 160) || '未知錯誤'));
       }
@@ -99,7 +100,7 @@ export default function AddTrade() {
     <div className="market-report" style={{ maxWidth: 520 }}>
       <p className="section-label">PORTFOLIO TRADE LOG</p>
       <h1 className="main-title">新增交易紀錄</h1>
-      <p className="subtitle">送出後寫入你的 Google Sheet 交易明細</p>
+      <p className="subtitle">送出後寫入 Google Sheet「交易紀錄」</p>
 
       <form
         onSubmit={handleSubmit}
@@ -111,9 +112,23 @@ export default function AddTrade() {
         }}
       >
         <label className="mr-note" style={{ display: 'block', marginBottom: 6 }}>股票代號</label>
-        <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="例如 2330" style={inputStyle} />
+        <input
+          value={code}
+          onChange={(e) => {
+            const v = e.target.value;
+            setCode(v);
+            const auto = lookupStockName(v);
+            if (auto) setName(auto);
+          }}
+          onBlur={() => {
+            const auto = lookupStockName(code);
+            if (auto) setName(auto);
+          }}
+          placeholder="例如 2330"
+          style={inputStyle}
+        />
 
-        <label className="mr-note" style={{ display: 'block', marginTop: 14, marginBottom: 6 }}>股票名稱（選填）</label>
+        <label className="mr-note" style={{ display: 'block', marginTop: 14, marginBottom: 6 }}>股票名稱（輸入代號自動帶入，可改）</label>
         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="例如 台積電" style={inputStyle} />
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, margin: '14px 0' }}>
@@ -163,7 +178,7 @@ export default function AddTrade() {
         <textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} style={{ ...inputStyle, resize: 'vertical', minHeight: 72 }} />
 
         {msg && (
-          <p className="mr-note" style={{ marginTop: 12, color: msg.includes('失敗') || msg.includes('舊版') || msg.includes('尚未') ? '#f87171' : 'var(--teal, #14b8a6)' }}>
+          <p className="mr-note" style={{ marginTop: 12, color: msg.includes('失敗') || msg.includes('舊版') ? '#f87171' : 'var(--teal, #14b8a6)' }}>
             {msg}
           </p>
         )}
