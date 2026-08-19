@@ -101,7 +101,8 @@ export default function PortfolioPnL() {
     <div className="market-report">
       <p className="section-label">PORTFOLIO P&L</p>
       <h1 className="main-title">持股損益總表</h1>
-      <p className="subtitle">依 ETF 與個股類股分類排列・現價來自最近持股資料</p>
+      <p className="subtitle">計算日期 2026/08/18（現價＝當日收盤）・依 ETF 與個股類股分類</p>
+      <p className="update-time" style={{ marginTop: -8, marginBottom: 16 }}>現價與損益計算基準：2026年8月18日</p>
 
       <div className="summary-row" style={{ gridTemplateColumns: 'repeat(3,1fr)', marginBottom: 20 }}>
         <div className="summary-card">
