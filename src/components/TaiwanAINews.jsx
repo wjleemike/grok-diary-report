@@ -5,39 +5,39 @@ export default function TaiwanAINews() {
   );
 
   const twNews = [
-    { title: '投信史上最大單日賣超177億 外資買超454億 三大法人合計買超291億', date: '2026-08-17', href: 'https://www.cna.com.tw/news/afe/202608170229.aspx' },
-    { title: '外資連6買累計逾2515億 買超ETF與貨櫃股 長榮、陽明同步走強', date: '2026-08-17', href: 'https://www.cna.com.tw/news/afe/202608170229.aspx' },
-    { title: '台股收45,857點小漲0.1% 盤中一度衝上46,189點後震盪收斂', date: '2026-08-17', href: 'https://tw.stock.yahoo.com/' },
-    { title: '廣達法說：AI伺服器能見度看至2028 全年營收倍增、產能年底翻倍', date: '2026-08-13', href: 'https://news.cnyes.com/news/id/6575714' },
-    { title: '廣達外資連日買超 8/17單日買超約5,525張 收333.5元漲1.83%', date: '2026-08-17', href: 'https://histock.tw/stock/chips.aspx?no=2382' },
-    { title: '外資本周買超力積電逾31萬張 記憶體與AI相關仍為布局重心', date: '2026-08-15', href: 'https://udn.com/news/story/7251/9692752' },
-    { title: '分析師：外資回補未集中AI主流股 期貨淨空單仍高 籌碼不宜過度樂觀', date: '2026-08-17', href: 'https://tw.stock.yahoo.com/news/%E3%80%90follow%E6%B3%95%E4%BA%BA%E3%80%91%E5%A4%96%E8%B3%87%E6%8E%83%E8%B2%A8%E5%8F%8B%E9%81%9449%E8%90%AC%E5%BC%B5%E5%B1%85%E5%86%A0%EF%BC%81%E7%8B%99%E6%AE%BA%E5%8A%9B%E7%A9%8D%E9%9B%BB68%E8%90%AC%E5%BC%B5-%E7%B5%82%E7%B5%90%E9%80%A34%E8%B2%B7-070623875.html' },
-    { title: '台積電守住2400關 川湖漲停創天價 光電與航運族群撐盤', date: '2026-08-17', href: 'https://tw.stock.yahoo.com/' },
-    { title: '投信大砍緯創、聯電、台積電 金融股反成投信買超主力', date: '2026-08-17', href: 'https://tw.stock.yahoo.com/' },
-    { title: '英業達、仁寶等ODM近期獲外資回補 伺服器與筆電題材續受關注', date: '2026-08-15', href: 'https://udn.com/news/story/7251/9692752' },
+    { title: '台股收 45,308.68 點跌 548.59 點（-1.20%） 成交約 9,584 億 半導體與記憶體承壓', date: '2026-08-18', href: 'https://focustaiwan.tw/business/202608180017' },
+    { title: '美股費半重挫近 5% 台指期夜盤失守 45K 跌約 500～560 點 開盤恐再挫', date: '2026-08-18', href: 'https://udn.com/news/story/7255/9699710' },
+    { title: '台積電收 2,380 元跌 0.83% 聯發科跌逾 4% 記憶體相關股普遍走弱', date: '2026-08-18', href: 'https://www.taiwannews.com.tw/en/news/6423533' },
+    { title: '三大法人 8/18 合計賣超約 257 億 外資賣超約 120 億、自營商賣超約 176 億', date: '2026-08-18', href: 'https://tw.news.yahoo.com/' },
+    { title: '外資期貨淨空單仍高 約 8.3 萬口 籌碼面偏空', date: '2026-08-18', href: 'https://www.cna.com.tw/news/afe/202608180156.aspx' },
+    { title: '廣達法說：AI 伺服器能見度看至 2028 全年營收倍增、產能年底翻倍', date: '2026-08-13', href: 'https://news.cnyes.com/news/id/6575714' },
+    { title: '美債 30 年殖利率創 19 年高 全球債券賣壓拖累成長股與科技股評價', date: '2026-08-18', href: 'https://www.bloomberg.com/' },
+    { title: '荷莫茲海峽緊張 油價走高 通膨與風險溢價再起', date: '2026-08-18', href: 'https://www.cnn.com/business' },
+    { title: 'Meta 成癮訴訟開庭 科技監管風險升溫', date: '2026-08-18', href: 'https://www.cnn.com/2026/08/18/tech/meta-attorneys-general-addiction-trial-opening-arguments' },
+    { title: 'Anthropic 預 IPO 信貸額度上看逾 100 億 長期 AI 算力需求敘事仍在', date: '2026-08-18', href: 'https://www.bloomberg.com/news/articles/2026-08-18/anthropic-pre-ipo-credit-facility-set-to-climb-past-10-billion' },
   ];
 
   const aiNews = [
-    { title: 'Nvidia 承諾最高約1050億美元信用／保證 支援 OpenAI 俄亥俄資料中心算力', en: 'Nvidia commits up to $105B guarantee for OpenAI Ohio data center with SoftBank', date: '2026-08-17', href: 'https://www.thestateofai.com/category/ai-industry-platforms' },
-    { title: 'Anthropic 營收年化跑速傳上看約650億美元 持續擴張運算承諾', en: 'Anthropic revenue run rate tops ~$65 billion, sources say', date: '2026-08-17', href: 'https://economictimes.indiatimes.com/' },
-    { title: 'Anthropic 擴大與 Google、Broadcom 合作 鎖定多 gigawatt 次世代運算', en: 'Anthropic expands partnership with Google and Broadcom for multiple gigawatts of next-gen compute', date: '2026-08-17', href: 'https://www.anthropic.com/news/google-broadcom-partnership-compute' },
-    { title: 'Stripe 擬以逾70億美元收購 AI 路由閘道 OpenRouter', en: 'Stripe to acquire AI gateway OpenRouter for over $7 billion', date: '2026-08-17', href: 'https://n8nlab.io/news' },
-    { title: 'OpenAI 傳解散 Preparedness 風險評估團隊 業務併入生物／網路單元', en: 'OpenAI disbands Preparedness team ahead of massive IPO', date: '2026-08-17', href: 'https://n8nlab.io/news' },
-    { title: 'xAI Grok 4.6 上架 GitHub Copilot 多 IDE 可選用', en: 'xAI Grok 4.6 reaches GitHub Copilot across multiple IDE surfaces', date: '2026-08-17', href: 'https://ai2india.com/ai-today/' },
-    { title: 'Google 推出 Gemini 3.7 Flash 主打 coding／agent 並祭出導入價', en: 'Google launches Gemini 3.7 Flash for coding and agents with introductory pricing', date: '2026-08-14', href: 'https://ai2india.com/ai-today/' },
-    { title: 'DeepSeek V4-Pro 全面上市 具備 agent 能力與長上下文', en: 'DeepSeek V4-Pro reaches general availability with agent capabilities', date: '2026-08-12', href: 'https://opendatascience.com/last-week-in-ai-news-august-10-16/' },
-    { title: 'Anthropic 對新 Claude 文字導入 SynthID 浮水印 因應歐盟 AI 法案', en: 'Anthropic implements SynthID-Text watermarking on new Claude text globally', date: '2026-08-14', href: 'https://ai2india.com/ai-today/' },
-    { title: 'OpenAI 與 Anthropic 商業模式趨同：營收衝高、企業與消費雙軌並進', en: 'OpenAI and Anthropic are racing to become the same company', date: '2026-08-16', href: 'https://www.thestateofai.com/category/ai-industry-platforms' },
+    { title: 'Anthropic 預 IPO 信貸額度上看逾 100 億美元 為上市做準備', en: 'Anthropic pre-IPO credit facility set to climb past $10 billion', date: '2026-08-18', href: 'https://www.bloomberg.com/news/articles/2026-08-18/anthropic-pre-ipo-credit-facility-set-to-climb-past-10-billion' },
+    { title: 'Anthropic 營收年化跑速傳上看約 650 億美元 持續擴張運算承諾', en: 'Anthropic revenue run rate tops ~$65 billion, sources say', date: '2026-08-17', href: 'https://www.bloomberg.com/' },
+    { title: 'OpenAI 推出 ChatGPT for Teens 加強未成年防護與家長控制', en: 'OpenAI builds dedicated ChatGPT experience for teens with parental controls', date: '2026-08-18', href: 'https://www.cnn.com/2026/08/18/tech/openai-chatgpt-for-teens' },
+    { title: 'Google 收購 Spirit Airlines 全部資料餵養 AI 模型', en: 'Google is buying all of Spirit Airlines’ data to feed its AI models', date: '2026-08-18', href: 'https://www.cnn.com/2026/08/18/business/google-spirit-airlines-data' },
+    { title: 'Nvidia 等大型 AI 基建敘事仍在 但短線受公債殖利率與評價壓力', en: 'AI infrastructure narrative intact but rates weigh on growth stocks', date: '2026-08-18', href: 'https://www.bloomberg.com/' },
+    { title: '記憶體與儲存股重挫 費半大跌近 5% 反映 AI 供應鏈短線獲利了結', en: 'Memory and storage stocks lead semiconductor selloff, SOX down ~5%', date: '2026-08-18', href: 'https://www.reuters.com/business/us-stock-futures-drop-fading-iran-peace-hopes-lift-oil-bond-yields-2026-08-18/' },
+    { title: 'David Malpass 警告 AI 循環性與美債風險', en: 'David Malpass warns of AI circularity and rising US debt', date: '2026-08-18', href: 'https://www.foxbusiness.com/category/markets' },
+    { title: 'Meta 面臨州檢察長成癮訴訟 科技監管風險升溫', en: 'States seek damages from Meta over child social media addiction claims', date: '2026-08-18', href: 'https://www.cnn.com/2026/08/18/tech/meta-attorneys-general-addiction-trial-opening-arguments' },
+    { title: '全球公債大賣壓 30 年美債殖利率創 19 年高 壓抑成長股評價', en: '30-year Treasury yield hits highest since 2007 amid global bond rout', date: '2026-08-18', href: 'https://www.bloomberg.com/' },
+    { title: 'AI 財富推升舊金山房市 加價百萬搶購潮延續', en: 'AI wealth fueling housing market frenzy in San Francisco', date: '2026-08-17', href: 'https://www.cnn.com/2026/08/17/economy/sf-real-estate-ai-wealth' },
   ];
 
   return (
     <div className="market-report">
       <h1 className="main-title">台股/AI焦點新聞</h1>
-      <p className="subtitle">今日核心趨勢：AI 基建與營收規模持續膨脹（Nvidia／OpenAI 算力、Anthropic 營收與 gigawatt 合作），台股則呈現外資買、投信大賣的籌碼分歧。</p>
+      <p className="subtitle">今日核心趨勢：美股科技股與費半重挫、美債殖利率創多年高點，台指期夜盤失守 45K；長線 AI 算力與營收敘事仍在，但短線籌碼與評價壓力升溫。</p>
 
       <section className="mr-section">
         <h2 className="mr-section-title">影響台股新聞</h2>
-        <p className="mr-note" style={{marginBottom:10}}>彙整時間：2026/08/18 ・ 約 10 則</p>
+        <p className="mr-note" style={{marginBottom:10}}>彙整時間：2026/08/19 ・ 約 10 則</p>
         <div className="mr-table-wrap">
           <table className="mr-table">
             <thead>
@@ -60,7 +60,7 @@ export default function TaiwanAINews() {
 
       <section className="mr-section">
         <h2 className="mr-section-title">AI 最新進展</h2>
-        <p className="mr-note" style={{marginBottom:10}}>彙整時間：2026/08/18 ・ 約 10 則（中英文標題・可點原文）</p>
+        <p className="mr-note" style={{marginBottom:10}}>彙整時間：2026/08/19 ・ 約 10 則（中英文標題・可點原文）</p>
         <div className="mr-table-wrap">
           <table className="mr-table">
             <thead>
@@ -88,17 +88,17 @@ export default function TaiwanAINews() {
         <h2 className="mr-section-title">對我的持股影響分析</h2>
         <div style={{background:'var(--card)',border:'1px solid var(--border)',borderRadius:12,padding:'16px 18px'}}>
           <p className="mr-note" style={{margin:0,lineHeight:1.75}}>
-            <strong>今日一句話：</strong>全球 AI 算力與營收敘事仍強，但台股籌碼呈現「外資買、投信大賣」，AI 供應鏈宜看長做短、留意整理。<br/><br/>
-            <strong>台股籌碼：</strong>8/17 三大法人合計買超約 291 億，外資買超約 454 億、投信賣超約 177 億（史上單日高檔）。指數收 45,857 點（+0.10%）。外資買盤偏 ETF／貨櫃，分析師提醒未明顯集中 AI 主流股，且期貨淨空單仍高，短線不宜過度樂觀。<br/><br/>
+            <strong>今日一句話：</strong>美股科技股與費半重挫、美債殖利率創多年高點，台指期夜盤失守 45K，短線半導體與 AI 供應鏈承壓；長線 AI 算力與營收敘事（Anthropic／OpenAI）仍在，宜控風險、看長做短。<br/><br/>
+            <strong>台股籌碼與盤勢：</strong>8/18 台股收 45,308.68 點（-1.20%），三大法人合計賣超約 257 億；夜盤台指期跌約 500～560 點、失守 45,000 點。外資期貨淨空單仍高，籌碼偏空。<br/><br/>
             <strong>對你持股的意涵：</strong><br/>
-            • <strong>台積電</strong>：守住 2400 關，中長期受 AI 算力擴張（Nvidia／OpenAI／Anthropic gigawatt）支撐，短線隨大盤震盪。<br/>
-            • <strong>廣達、英業達、技嘉</strong>：廣達法說能見度至 2028、產能倍增；外資對廣達近幾日偏買。AI 伺服器需求敘事仍在，但需留意法人輪動與大盤整理。<br/>
-            • <strong>智原、材料-KY、中信關鍵半導體</strong>：受惠先進製程與 AI 供應鏈題材，與美股費半／AI 基建新聞連動較高。<br/>
-            • <strong>金融股（中信金、玉山金、凱基金等）</strong>：投信偏買金融、外資調節部分金控股，短線波動可能加大。<br/>
-            • <strong>長榮</strong>：外資買超貨櫃股，航運族群有資金關注，但與 AI 主線相關性較低。<br/><br/>
+            • <strong>台積電</strong>：受費半與 ADR 連動壓力，短線震盪加大；中長期仍受 AI 算力擴張支撐。<br/>
+            • <strong>廣達、英業達、技嘉</strong>：AI 伺服器能見度與法說題材仍在，但短線受美股科技股情緒拖累，宜留意整理。<br/>
+            • <strong>智原、材料-KY、中信關鍵半導體</strong>：與費半／半導體循環高度連動，短線波動放大。<br/>
+            • <strong>金融股（中信金等）</strong>：美債殖利率走高對利差有雙面影響，風險偏好下降時波動可能加大。<br/>
+            • <strong>長榮</strong>：油價上漲對成本與運價有雙面影響，與 AI 主線相關性較低。<br/><br/>
             以上為依公開資訊之綜合整理，非投資建議。請以即時報價與自身風險承受度為準。
           </p>
-          <p className="mr-note" style={{marginTop:12,marginBottom:0,fontSize:11}}>分析時間：2026/08/18</p>
+          <p className="mr-note" style={{marginTop:12,marginBottom:0,fontSize:11}}>分析時間：2026/08/19</p>
         </div>
       </section>
     </div>
