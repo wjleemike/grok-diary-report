@@ -1,14 +1,13 @@
 /**
  * Grok 交易紀錄寫入 Sheet
- * 1. 貼上 → 儲存
- * 2. 先執行 testListSheets（授權）
- * 3. 部署 → 新增部署 → 網頁應用程式 → 任何人
+ * 寫入位置：目前「可見」且有資料的最後一列下方（略過隱藏列與預填空列）
+ *
+ * 更新後請：儲存 → 部署 → 管理部署 → 新版本 → 部署
  */
 
 var SPREADSHEET_ID = '14ZGEQp3AkQIPx2fOEUyZy11sNpEr4mhGkP6Ei3RNs4w';
 var SHEET_NAME = '交易紀錄';
 
-/** 在編輯器執行這個：授權 + 列出所有分頁名稱 */
 function testListSheets() {
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   var names = ss.getSheets().map(function (s) {
@@ -18,7 +17,6 @@ function testListSheets() {
   return names;
 }
 
-/** 在編輯器執行：測試寫入一列到「交易紀錄」 */
 function testAppend() {
   var result = appendTrade_({
     code: 'TEST',
@@ -37,46 +35,63 @@ function getTargetSheet_() {
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   var sheet = ss.getSheetByName(SHEET_NAME);
   if (sheet) return sheet;
-
-  // 常見別名
   sheet =
     ss.getSheetByName('交易明細') ||
     ss.getSheetByName('交易記錄') ||
     ss.getSheetByName('交易记录');
   if (sheet) return sheet;
-
-  // 沒有就新建「交易紀錄」並寫表頭
   sheet = ss.insertSheet(SHEET_NAME);
   sheet.appendRow([
-    '交易編號',
-    '交易日期',
-    '買/賣/股利',
-    '代號',
-    '股票',
-    '交易類別',
-    '買入股數',
-    '買入價格',
-    '賣出股數',
-    '賣出價格',
-    '現價',
-    '手續費',
-    '折讓後手續費',
-    '交易稅',
-    '成交價金',
-    '交易成本',
-    '支出',
-    '收入',
-    '買入比現價高',
-    '決策原因',
-    '手續費折數',
+    '交易編號', '交易日期', '買/賣/股利', '代號', '股票', '交易類別',
+    '買入股數', '買入價格', '賣出股數', '賣出價格', '現價',
+    '手續費', '折讓後手續費', '交易稅', '成交價金', '交易成本',
+    '支出', '收入', '買入比現價高', '決策原因', '手續費折數',
   ]);
   return sheet;
+}
+
+/** 最後一列「可見 + 有實際交易資料」的列號（略過隱藏列、只有 0.6 的預填空列） */
+function findLastVisibleDataRow_(sheet) {
+  var last = sheet.getLastRow();
+  if (last < 2) return 1;
+  // A 交易編號, B 交易日期, D 代號
+  var values = sheet.getRange(1, 1, last, 4).getValues();
+  for (var r = last; r >= 2; r--) {
+    if (sheet.isRowHiddenByUser(r)) continue;
+    var a = values[r - 1][0];
+    var b = values[r - 1][1];
+    var d = values[r - 1][3];
+    var hasA = a !== '' && a != null;
+    var hasB = b !== '' && b != null;
+    var hasD = d !== '' && d != null;
+    if (hasA || hasB || hasD) return r;
+  }
+  return 1;
+}
+
+/** 下一個交易編號 = 既有編號最大值 + 1 */
+function nextTradeId_(sheet, upToRow) {
+  if (upToRow < 2) return 1;
+  var ids = sheet.getRange(2, 1, upToRow, 1).getValues();
+  var max = 0;
+  for (var i = 0; i < ids.length; i++) {
+    var n = Number(ids[i][0]);
+    if (!isNaN(n) && n > max) max = n;
+  }
+  return max + 1;
 }
 
 function appendTrade_(data) {
   data = data || {};
   var sheet = getTargetSheet_();
-  var nextId = sheet.getLastRow();
+  var lastData = findLastVisibleDataRow_(sheet);
+  var insertRow = lastData + 1;
+  var tradeId = nextTradeId_(sheet, lastData);
+
+  // 若插入位置已被隱藏，往下找第一個可見列
+  while (insertRow <= sheet.getMaxRows() && sheet.isRowHiddenByUser(insertRow)) {
+    insertRow++;
+  }
 
   var typeMap = {
     buy: '買',
@@ -110,8 +125,8 @@ function appendTrade_(data) {
     buyPrice = 0;
   }
 
-  sheet.appendRow([
-    nextId,
+  var row = [
+    tradeId,
     data.date || '',
     typeLabel,
     String(data.code || ''),
@@ -132,9 +147,17 @@ function appendTrade_(data) {
     '',
     data.reason || '',
     data.feeDiscount != null ? data.feeDiscount : 0.6,
-  ]);
+  ];
 
-  return { ok: true, id: nextId, sheet: sheet.getName() };
+  // 寫入「可見最後一筆」的下一列（不使用 appendRow，避免跳到預填區最底）
+  sheet.getRange(insertRow, 1, 1, row.length).setValues([row]);
+
+  return {
+    ok: true,
+    id: tradeId,
+    row: insertRow,
+    sheet: sheet.getName(),
+  };
 }
 
 function doGet(e) {
@@ -147,7 +170,8 @@ function doGet(e) {
       ok: true,
       service: 'grok-trade-log',
       target: SHEET_NAME,
-      version: 3,
+      version: 4,
+      note: 'insert below last visible data row',
     });
   } catch (err) {
     return json_({ ok: false, error: String(err) });
