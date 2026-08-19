@@ -43,7 +43,7 @@ export default function AddTrade() {
       return;
     }
     if (!configured) {
-      setMsg('尚未設定 Google Apps Script 網址，請先完成 Sheet 串接（見下方說明）');
+      setMsg('尚未設定 Google Apps Script 網址，請先完成 Sheet 串接');
       return;
     }
 
@@ -61,16 +61,29 @@ export default function AddTrade() {
     setLoading(true);
     setMsg('');
     try {
-      await fetch(SHEETS_WEBAPP_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload),
+      const qs = new URLSearchParams({
+        action: 'append',
+        payload: JSON.stringify(payload),
       });
-      setMsg('已送出至 Google Sheet（請至試算表確認是否出現新列）');
-      setShares('');
-      setPrice('');
-      setReason('');
+      const res = await fetch(`${SHEETS_WEBAPP_URL}?${qs.toString()}`, {
+        method: 'GET',
+        redirect: 'follow',
+      });
+      const text = await res.text();
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch {
+        result = null;
+      }
+      if (result && result.ok) {
+        setMsg(`已寫入 Google Sheet（列編號 ${result.id}${result.sheet ? '／分頁 ' + result.sheet : ''}）`);
+        setShares('');
+        setPrice('');
+        setReason('');
+      } else {
+        setMsg('送出失敗：' + (result?.error || text.slice(0, 160) || '未知錯誤。若尚未更新 Apps Script，請貼上新版 Code.gs 並重新部署。'));
+      }
     } catch (err) {
       setMsg('送出失敗：' + (err?.message || String(err)));
     } finally {
@@ -83,29 +96,6 @@ export default function AddTrade() {
       <p className="section-label">PORTFOLIO TRADE LOG</p>
       <h1 className="main-title">新增交易紀錄</h1>
       <p className="subtitle">送出後寫入你的 Google Sheet 交易明細</p>
-
-      {!configured && (
-        <div
-          style={{
-            background: 'rgba(245, 158, 11, 0.12)',
-            border: '1px solid rgba(245, 158, 11, 0.35)',
-            borderRadius: 12,
-            padding: '12px 14px',
-            marginBottom: 16,
-            fontSize: 13,
-            lineHeight: 1.6,
-            color: 'var(--text)',
-          }}
-        >
-          <strong>尚未串接 Google Sheet</strong>
-          <ol style={{ margin: '8px 0 0', paddingLeft: 18 }}>
-            <li>開啟試算表 → 擴充功能 → Apps Script</li>
-            <li>貼上專案內 <code>apps-script/Code.gs</code> 內容並儲存</li>
-            <li>部署 → 網頁應用程式 → 執行身分「我」→ 存取權「任何人」</li>
-            <li>複製網址，貼到 <code>src/config.js</code> 的 <code>SHEETS_WEBAPP_URL</code> 後重新部署網站</li>
-          </ol>
-        </div>
-      )}
 
       <form
         onSubmit={handleSubmit}
