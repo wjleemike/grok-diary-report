@@ -8,7 +8,7 @@ const rows = [
   { name:'中信中國高股息', tag:'ETF', sector:'高息／科技 ETF', shares:2020, avg:12.68, price:14.88, chg:-0.73, mv:30058, pnl:4444, pct:17.35, div:'1,101' },
   { name:'元大台灣價值高息', tag:'ETF', sector:'高息／科技 ETF', shares:2300, avg:9.63, price:12.34, chg:-0.96, mv:28382, pnl:6233, pct:28.14, div:'—' },
   { name:'主動野村台灣優選', tag:'ETF', sector:'高息／科技 ETF', shares:1150, avg:19.01, price:24.52, chg:-4.29, mv:28198, pnl:6337, pct:28.98, div:'—' },
-  { name:'台積電', tag:'個股', sector:'半導體', shares:30, avg:1525.43, price:2380.00, chg:-0.83, mv:71400, pnl:25637, pct:56.02, div:'—' },
+  { name:'台積電', tag:'個股', sector:'半導體', shares:30, avg:1525.43, price:2350.00, chg:-1.26, mv:70500, pnl:24737, pct:54.05, div:'—' },
   { name:'智原', tag:'個股', sector:'半導體', shares:450, avg:162.05, price:172.00, chg:-2.82, mv:77400, pnl:4478, pct:6.14, div:'—' },
   { name:'材料-KY', tag:'個股', sector:'半導體', shares:3050, avg:50.11, price:50.40, chg:0.60, mv:153720, pnl:1190, pct:0.78, div:'—' },
   { name:'原相', tag:'個股', sector:'半導體', shares:125, avg:203.44, price:197.00, chg:-0.76, mv:24625, pnl:-805, pct:-3.17, div:'—' },
@@ -101,8 +101,8 @@ export default function PortfolioPnL() {
     <div className="market-report">
       <p className="section-label">PORTFOLIO P&L</p>
       <h1 className="main-title">持股損益總表</h1>
-      <p className="subtitle">計算日期 2026/08/18（現價＝當日收盤）・依 ETF 與個股類股分類</p>
-      <p className="update-time" style={{ marginTop: -8, marginBottom: 16 }}>現價與損益計算基準：2026年8月18日</p>
+      <p className="subtitle">計算日期 2026/08/19（台積電已用當日收盤；其餘多數仍為前次基準）・依 ETF 與個股類股分類</p>
+      <p className="update-time" style={{ marginTop: -8, marginBottom: 16 }}>現價與損益計算基準：2026年8月19日</p>
 
       <div className="summary-row" style={{ gridTemplateColumns: 'repeat(3,1fr)', marginBottom: 20 }}>
         <div className="summary-card">
@@ -159,7 +159,7 @@ export default function PortfolioPnL() {
       </section>
 
       <p className="mr-note" style={{ marginTop: 12 }}>
-        未實現損益 = 市值 − 持有股數 × 買入均價（不含手續費／交易稅；已賣出部位的實現損益不在此表統計）。累計已收股利含現金股利收入，不含股票股利。
+        未實現損益 = 市值 − 持有股數 × 買入均價（不含手續費／交易稅）。總市值數字尚未依全部個股今日收盤重算，僅台積電已更新。
       </p>
     </div>
   );
