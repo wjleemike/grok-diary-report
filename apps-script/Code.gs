@@ -1,98 +1,134 @@
 /**
  * Grok 每日報告 — 新增交易紀錄寫入 Google Sheet
  *
- * 設定步驟：
- * 1. 開啟試算表 https://docs.google.com/spreadsheets/d/14ZGEQp3AkQIPx2fOEUyZy11sNpEr4mhGkP6Ei3RNs4w
- * 2. 擴充功能 → Apps Script，貼上本檔全部內容並儲存
- * 3. 部署 → 新增部署 → 類型選「網頁應用程式」
- *    - 執行身分：我
- *    - 具有存取權的使用者：任何人
- * 4. 部署後複製「網頁應用程式網址」，貼到網站 src/config.js 的 SHEETS_WEBAPP_URL
+ * 設定：
+ * 1. 貼上本檔 → 儲存
+ * 2. 部署 → 管理部署 → 編輯 → 版本選「新版本」→ 部署
+ *    （或新增部署：網頁應用程式 / 執行身分：我 / 任何人）
+ * 3. 網址維持貼在網站 src/config.js
+ *
+ * 寫入方式：GET ?action=append&payload=<URL-encoded JSON>
  */
 
-var SHEET_NAME = ''; // 留空 = 使用 gid 593571516 對應分頁；或填分頁名稱如「交易明細」
+var SPREADSHEET_ID = '14ZGEQp3AkQIPx2fOEUyZy11sNpEr4mhGkP6Ei3RNs4w';
+var SHEET_GID = 593571516;
+var SHEET_NAME = ''; // 可改成實際分頁名稱，例如「交易明細」
 
-function doPost(e) {
+function getTargetSheet_() {
+  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+  if (SHEET_NAME) {
+    var byName = ss.getSheetByName(SHEET_NAME);
+    if (byName) return byName;
+  }
+  var sheets = ss.getSheets();
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].getSheetId() == SHEET_GID) return sheets[i];
+  }
+  return ss.getSheets()[0];
+}
+
+function appendTrade_(data) {
+  var sheet = getTargetSheet_();
+  var nextId = sheet.getLastRow();
+
+  var typeMap = { buy: '買', sell: '賣', cash_div: '股利', stock_div: '股利' };
+  var typeLabel = typeMap[data.type] || data.type || '';
+  var tradeClass = data.tradeClass || '一般';
+  var fee = Number(data.fee) || 0;
+
+  var buyShares = '';
+  var buyPrice = '';
+  var sellShares = '';
+  var sellPrice = '';
+  var expense = 0;
+  var income = 0;
+
+  if (data.type === 'buy') {
+    buyShares = Number(data.shares) || 0;
+    buyPrice = Number(data.price) || 0;
+    expense = Math.round(buyShares * buyPrice + fee);
+  } else if (data.type === 'sell') {
+    sellShares = Number(data.shares) || 0;
+    sellPrice = Number(data.price) || 0;
+    income = Math.round(sellShares * sellPrice - fee);
+  } else if (data.type === 'cash_div') {
+    income = Number(data.price) || Number(data.amount) || 0;
+  } else if (data.type === 'stock_div') {
+    buyShares = Number(data.shares) || 0;
+    buyPrice = 0;
+  }
+
+  var row = [
+    nextId,
+    data.date || '',
+    typeLabel,
+    String(data.code || ''),
+    data.name || '',
+    tradeClass,
+    buyShares === '' ? '' : buyShares,
+    buyPrice === '' ? '' : buyPrice,
+    sellShares === '' ? '' : sellShares,
+    sellPrice === '' ? '' : sellPrice,
+    '',
+    fee,
+    fee,
+    Number(data.tax) || 0,
+    '',
+    fee,
+    expense,
+    income,
+    '',
+    data.reason || '',
+    data.feeDiscount != null ? data.feeDiscount : 0.6
+  ];
+
+  sheet.appendRow(row);
+  return { ok: true, id: nextId, sheet: sheet.getName() };
+}
+
+function doGet(e) {
   try {
-    var data = JSON.parse(e.postData.contents);
-    var ss = SpreadsheetApp.openById('14ZGEQp3AkQIPx2fOEUyZy11sNpEr4mhGkP6Ei3RNs4w');
-    var sheet = SHEET_NAME
-      ? ss.getSheetByName(SHEET_NAME)
-      : (function(){ var sheets=ss.getSheets(); for (var i=0;i<sheets.length;i++){ if(sheets[i].getSheetId()==593571516) return sheets[i]; } return ss.getSheets()[0]; })();
+    e = e || { parameter: {} };
+    var p = e.parameter || {};
 
-    var lastRow = sheet.getLastRow();
-    var nextId = lastRow;
-
-    var typeMap = {
-      buy: '買',
-      sell: '賣',
-      cash_div: '股利',
-      stock_div: '股利'
-    };
-    var typeLabel = typeMap[data.type] || data.type;
-    var tradeClass = data.tradeClass || '一般';
-
-    var buyShares = '';
-    var buyPrice = '';
-    var sellShares = '';
-    var sellPrice = '';
-    var expense = '';
-    var income = '';
-    var fee = data.fee || 0;
-
-    if (data.type === 'buy') {
-      buyShares = Number(data.shares) || 0;
-      buyPrice = Number(data.price) || 0;
-      expense = Math.round(buyShares * buyPrice + Number(fee));
-    } else if (data.type === 'sell') {
-      sellShares = Number(data.shares) || 0;
-      sellPrice = Number(data.price) || 0;
-      income = Math.round(sellShares * sellPrice - Number(fee));
-    } else if (data.type === 'cash_div') {
-      income = Number(data.price) || Number(data.amount) || 0;
-    } else if (data.type === 'stock_div') {
-      buyShares = Number(data.shares) || 0;
-      buyPrice = 0;
+    if (p.action === 'append' && p.payload) {
+      var data = JSON.parse(p.payload);
+      var result = appendTrade_(data);
+      return json_(result);
     }
 
-    var row = [
-      nextId,
-      data.date || '',
-      typeLabel,
-      String(data.code || ''),
-      data.name || '',
-      tradeClass,
-      buyShares === '' ? '' : buyShares,
-      buyPrice === '' ? '' : buyPrice,
-      sellShares === '' ? '' : sellShares,
-      sellPrice === '' ? '' : sellPrice,
-      '',
-      fee || 0,
-      fee || 0,
-      data.tax || 0,
-      '',
-      fee || 0,
-      expense === '' ? 0 : expense,
-      income === '' ? 0 : income,
-      '',
-      data.reason || '',
-      data.feeDiscount || 0.6
-    ];
-
-    sheet.appendRow(row);
-
-    return ContentService
-      .createTextOutput(JSON.stringify({ ok: true, id: nextId }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return json_({ ok: true, service: 'grok-trade-log', hint: 'use ?action=append&payload=JSON' });
   } catch (err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ ok: false, error: String(err) }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return json_({ ok: false, error: String(err) });
   }
 }
 
-function doGet() {
+function doPost(e) {
+  try {
+    var data;
+    if (e.postData && e.postData.contents) {
+      try {
+        data = JSON.parse(e.postData.contents);
+      } catch (err1) {
+        if (e.parameter && e.parameter.payload) {
+          data = JSON.parse(e.parameter.payload);
+        } else {
+          throw err1;
+        }
+      }
+    } else if (e.parameter && e.parameter.payload) {
+      data = JSON.parse(e.parameter.payload);
+    } else {
+      throw new Error('no payload');
+    }
+    return json_(appendTrade_(data));
+  } catch (err) {
+    return json_({ ok: false, error: String(err) });
+  }
+}
+
+function json_(obj) {
   return ContentService
-    .createTextOutput(JSON.stringify({ ok: true, service: 'grok-trade-log' }))
+    .createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
 }
