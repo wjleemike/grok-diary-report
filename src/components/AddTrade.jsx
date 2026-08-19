@@ -61,52 +61,59 @@ export default function AddTrade() {
     };
 
     setLoading(true);
-    setMsg('寫入中（約 3–8 秒）…');
+    setMsg('已送出，正在寫入 Sheet…');
     const started = Date.now();
-    try {
-      const qs = new URLSearchParams({
-        action: 'append',
-        payload: JSON.stringify(payload),
-      });
-      const res = await fetch(`${SHEETS_WEBAPP_URL}?${qs.toString()}`, {
-        method: 'GET',
-        redirect: 'follow',
-      });
-      const text = await res.text();
-      let result;
-      try {
-        result = JSON.parse(text);
-      } catch {
-        result = null;
-      }
+    const qs = new URLSearchParams({
+      action: 'append',
+      payload: JSON.stringify(payload),
+    });
+    const url = `${SHEETS_WEBAPP_URL}?${qs.toString()}`;
 
-      const sec = ((Date.now() - started) / 1000).toFixed(1);
-      if (result && result.ok && result.id != null) {
-        setMsg(`已寫入（編號 ${result.id}／${result.sheet || '交易紀錄'}／${result.name || resolvedName}，${sec}s）`);
-        setShares('');
-        setPrice('');
-        setReason('');
-      } else if (result && result.ok && result.service) {
-        setMsg('腳本不是 v9。請貼上最新 Code.gs 並部署「新版本」，/exec 需顯示 version:9');
-      } else {
-        setMsg('送出失敗：' + (result?.error || text.slice(0, 120) || '未知'));
-      }
-    } catch (err) {
-      setMsg(
-        '回應逾時或網路中斷。請直接看試算表是否已多一列；若有即寫入成功。(' +
-          (err?.message || '') +
-          ')',
-      );
-    } finally {
+    const unlockTimer = setTimeout(() => {
       setLoading(false);
-    }
+      setMsg((prev) =>
+        prev.startsWith('已寫入') || prev.startsWith('送出失敗')
+          ? prev
+          : '已送出。Sheet 仍在寫入，請稍後看「交易紀錄」（不必一直等這個畫面）',
+      );
+    }, 2500);
+
+    fetch(url, { method: 'GET', redirect: 'follow' })
+      .then((res) => res.text())
+      .then((text) => {
+        clearTimeout(unlockTimer);
+        let result;
+        try {
+          result = JSON.parse(text);
+        } catch {
+          result = null;
+        }
+        const sec = ((Date.now() - started) / 1000).toFixed(1);
+        if (result && result.ok && result.id != null) {
+          setMsg(`已寫入（編號 ${result.id}／${result.sheet || '交易紀錄'}／${result.name || resolvedName}，${sec}s）`);
+          setShares('');
+          setPrice('');
+          setReason('');
+        } else if (result && result.ok && result.service) {
+          setMsg('腳本不是 v10。請貼上最新 Code.gs 並部署「新版本」，/exec 需顯示 version:10');
+        } else {
+          setMsg('送出失敗：' + (result?.error || String(text).slice(0, 120) || '未知'));
+        }
+      })
+      .catch((err) => {
+        clearTimeout(unlockTimer);
+        setMsg('網路中斷。請直接看試算表是否已多一列。' + (err?.message || ''));
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }
 
   return (
     <div className="market-report" style={{ maxWidth: 520 }}>
       <p className="section-label">PORTFOLIO TRADE LOG</p>
       <h1 className="main-title">新增交易紀錄</h1>
-      <p className="subtitle">編號 = 最後編號+1；名稱由代號自動帶入</p>
+      <p className="subtitle">編號 = 最後編號+1；約 2.5 秒後畫面會先解鎖</p>
 
       <form
         onSubmit={handleSubmit}
@@ -166,7 +173,7 @@ export default function AddTrade() {
         ) : isCashDiv ? (
           <>
             <label className="mr-note" style={{ display: 'block', marginTop: 14, marginBottom: 6 }}>現金股利金額</label>
-            <input value={price} onChange={(e) => setPrice(e.target.value)} type="number" min="0" step="0.01" style={inputStyle} />
+            <input value={price} onChange={(e) => setPrice(e.target.value)} type="number" min="0" step="0.01" placeholder="例如 1500" style={inputStyle} />
           </>
         ) : (
           <>
@@ -203,7 +210,7 @@ export default function AddTrade() {
             opacity: loading ? 0.7 : 1,
           }}
         >
-          {loading ? '寫入中…' : '送出'}
+          {loading ? '送出中…' : '送出'}
         </button>
       </form>
     </div>

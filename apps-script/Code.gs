@@ -1,8 +1,10 @@
 /**
- * Grok 交易紀錄 (v9)
- * - 交易編號 = 最後有效編號 + 1（略過日期格式的錯誤列）
- * - 編號以文字寫入，避免 1900/x/x
- * - 一次寫入多欄，加快速度
+ * Grok 交易紀錄 (v10)
+ * - 編號 = 最後有效編號 + 1（略過 1900/x/x）
+ * - 編號以純文字寫入（先設格式再寫值）
+ * - 用快取減少掃描，加快寫入
+ *
+ * 更新：貼上 → 儲存 → 部署 → 管理部署 → 新版本
  */
 var SPREADSHEET_ID = '14ZGEQp3AkQIPx2fOEUyZy11sNpEr4mhGkP6Ei3RNs4w';
 var SHEET_NAME = '交易紀錄';
@@ -22,29 +24,47 @@ function getSheet_() {
   return ss.getSheetByName(SHEET_NAME) || ss.getSheetByName('交易明細') || ss.getSheets()[0];
 }
 
-function findLastDataRow_(sheet) {
-  var vals = sheet.getRange('D2:D300').getDisplayValues();
-  for (var i = vals.length - 1; i >= 0; i--) {
-    if (String(vals[i][0]).trim() !== '') return i + 2;
-  }
-  return 1;
+function parseId_(raw, display) {
+  if (raw instanceof Date) return 0;
+  var d = String(display || raw || '');
+  if (d.indexOf('/') >= 0 || d.indexOf('-') >= 4) return 0;
+  var n = parseInt(String(d).replace(/,/g, ''), 10);
+  if (isNaN(n) || n < 1 || n > 99999) return 0;
+  return n;
 }
 
-/** 最後有效編號 + 1；略過 Date / 1900/x/x */
-function nextTradeId_(sheet, upToRow) {
-  if (upToRow < 2) return 1;
-  var vals = sheet.getRange(2, 1, upToRow, 1).getValues();
-  var displays = sheet.getRange(2, 1, upToRow, 1).getDisplayValues();
-  var max = 0;
-  for (var i = 0; i < vals.length; i++) {
-    var v = vals[i][0];
-    var d = String(displays[i][0] || '');
-    if (v instanceof Date) continue;
-    if (d.indexOf('/') >= 0) continue;
-    var n = parseInt(d.replace(/,/g, ''), 10);
-    if (!isNaN(n) && n > max && n < 100000) max = n;
+function scanCursor_(sheet) {
+  var last = Math.min(sheet.getLastRow(), 350);
+  if (last < 2) return { lastRow: 1, lastId: 0 };
+  var block = sheet.getRange(2, 1, last - 1, 4).getDisplayValues();
+  var lastRow = 1;
+  var lastId = 0;
+  for (var i = 0; i < block.length; i++) {
+    var code = String(block[i][3] || '').trim();
+    var idDisp = String(block[i][0] || '').trim();
+    if (!code && !idDisp) continue;
+    lastRow = i + 2;
+    var n = parseId_(idDisp, idDisp);
+    if (n > lastId) lastId = n;
   }
-  return max + 1;
+  return { lastRow: lastRow, lastId: lastId };
+}
+
+function getCursor_(sheet) {
+  var p = PropertiesService.getScriptProperties();
+  var lastRow = Number(p.getProperty('lastRow') || 0);
+  var lastId = Number(p.getProperty('lastId') || 0);
+  if (lastRow >= 2 && lastId >= 1) return { lastRow: lastRow, lastId: lastId };
+  var c = scanCursor_(sheet);
+  p.setProperties({ lastRow: String(c.lastRow), lastId: String(c.lastId) });
+  return c;
+}
+
+function saveCursor_(row, id) {
+  PropertiesService.getScriptProperties().setProperties({
+    lastRow: String(row),
+    lastId: String(id),
+  });
 }
 
 function parseDate_(s) {
@@ -56,17 +76,20 @@ function parseDate_(s) {
 function appendTrade_(data) {
   data = data || {};
   var sheet = getSheet_();
-  var lastData = findLastDataRow_(sheet);
-  var row = lastData + 1;
-  var tradeId = nextTradeId_(sheet, lastData);
+  var cur = getCursor_(sheet);
+  var row = cur.lastRow + 1;
+  var tradeId = cur.lastId + 1;
 
   var typeMap = { buy: '買', sell: '賣', cash_div: '股利', stock_div: '股利' };
   var typeLabel = typeMap[data.type] || String(data.type || '');
   var code = String(data.code || '').trim();
-  var name = (data.name || NAME_MAP[code] || '') + '';
+  var name = String(data.name || NAME_MAP[code] || '');
   var tradeClass = data.tradeClass || '一般';
 
-  var buyShares = '', buyPrice = '', sellShares = '', sellPrice = '';
+  var buyShares = '';
+  var buyPrice = '';
+  var sellShares = '';
+  var sellPrice = '';
   var income = '';
   if (data.type === 'buy') {
     buyShares = Number(data.shares) || 0;
@@ -80,30 +103,24 @@ function appendTrade_(data) {
     buyShares = Number(data.shares) || 0;
   }
 
-  // A-J 一次寫入（較快）
-  // A 用字串編號，避免被當成日期序號
-  sheet.getRange(row, 1, 1, 10).setValues([[
-    String(tradeId),
-    parseDate_(data.date),
-    typeLabel,
-    code,
-    name,
-    tradeClass,
-    buyShares,
-    buyPrice,
-    sellShares,
-    sellPrice,
-  ]]);
+  var a = sheet.getRange(row, 1);
+  a.setNumberFormat('@');
+  a.setValue(String(tradeId));
 
-  // 強制格式：A 文字、B 日期、D 文字
-  sheet.getRange(row, 1).setNumberFormat('@');
-  sheet.getRange(row, 2).setNumberFormat('yyyy/mm/dd');
+  var b = sheet.getRange(row, 2);
+  b.setNumberFormat('yyyy/mm/dd');
+  b.setValue(parseDate_(data.date));
+
+  sheet.getRange(row, 3, 1, 8).setValues([[
+    typeLabel, code, name, tradeClass, buyShares, buyPrice, sellShares, sellPrice,
+  ]]);
   sheet.getRange(row, 4).setNumberFormat('@');
 
   if (income !== '') sheet.getRange(row, 18).setValue(income);
-  sheet.getRange(row, 20).setValue(data.reason || '');
+  if (data.reason) sheet.getRange(row, 20).setValue(data.reason);
   sheet.getRange(row, 21).setValue(0.6);
 
+  saveCursor_(row, tradeId);
   return { ok: true, id: tradeId, row: row, sheet: sheet.getName(), name: name };
 }
 
@@ -113,7 +130,13 @@ function doGet(e) {
     if (p.action === 'append' && p.payload) {
       return json_(appendTrade_(JSON.parse(p.payload)));
     }
-    return json_({ ok: true, service: 'grok-trade-log', target: SHEET_NAME, version: 9 });
+    if (p.action === 'resetCursor') {
+      PropertiesService.getScriptProperties().deleteAllProperties();
+      var c = scanCursor_(getSheet_());
+      saveCursor_(c.lastRow, c.lastId);
+      return json_({ ok: true, reset: c, version: 10 });
+    }
+    return json_({ ok: true, service: 'grok-trade-log', target: SHEET_NAME, version: 10 });
   } catch (err) {
     return json_({ ok: false, error: String(err) });
   }
