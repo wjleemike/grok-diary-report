@@ -115,7 +115,7 @@ export default function PortfolioPnL() {
         </div>
         <div className="summary-card">
           <div className="label">總未實現損益</div>
-          <div className="value" style={{ color: 'var(--green)' }}>+334,810</div>
+          <div className="value" style={{ color: 'var(--reds)' }}>+334,810</div>
           <div className="label" style={{ marginTop: 4 }}>(+21.58%)</div>
         </div>
       </div>

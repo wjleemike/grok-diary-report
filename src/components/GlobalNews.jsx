@@ -97,10 +97,10 @@ export default function GlobalNews() {
       <section className="mr-section">
         <h2 className="mr-section-title">2. 昨日美股收盤解析（2026/08/18）</h2>
         <div className="us-markets mr-global" style={{ marginBottom: 16 }}>
-          <div className="us-card"><div className="label">道瓊 Dow</div><div className="value">53,343.40</div><div className="change down">-116.38 (-0.22%)</div></div>
-          <div className="us-card"><div className="label">S&P 500</div><div className="value">7,691.76</div><div className="change down">-53.30 (-0.69%)</div></div>
-          <div className="us-card"><div className="label">Nasdaq</div><div className="value">26,289.71</div><div className="change down">-355.20 (-1.33%)</div></div>
-          <div className="us-card"><div className="label">費半 SOX</div><div className="value">~11,992</div><div className="change down">約 -4.98%</div></div>
+          <div className="us-card"><div className="label">道瓊 Dow</div><div className="value change down">53,343.40</div><div className="change down">-116.38 (-0.22%)</div></div>
+          <div className="us-card"><div className="label">S&P 500</div><div className="value change down">7,691.76</div><div className="change down">-53.30 (-0.69%)</div></div>
+          <div className="us-card"><div className="label">Nasdaq</div><div className="value change down">26,289.71</div><div className="change down">-355.20 (-1.33%)</div></div>
+          <div className="us-card"><div className="label">費半 SOX</div><div className="value change down">~11,992</div><div className="change down">約 -4.98%</div></div>
         </div>
         <p className="mr-note" style={{ marginBottom: 12 }}>
           <strong>收盤概況：</strong>三大指數全面收黑，那斯達克與費半跌幅最重；30 年美債殖利率一度升至 5.32%～5.34%（約 19 年新高），半導體與記憶體股重挫成為主要拖累。

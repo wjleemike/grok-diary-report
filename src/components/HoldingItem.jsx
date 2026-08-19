@@ -15,7 +15,7 @@ export default function HoldingItem({ holding }) {
       <div className="holding-right">
         <div>
           <div className="holding-price">{formatPrice(holding.price)}</div>
-          <div className="holding-change" style={{ color: isPositive ? 'var(--green)' : undefined }}>
+          <div className={`holding-change ${isPositive ? 'up' : 'down'}`}>
             {isPositive ? '+' : ''}{holding.changePct.toFixed(2)}%<br />未實現 {isPositive ? '+' : ''}{formatNumber(holding.dailyPnl)}
           </div>
         </div>

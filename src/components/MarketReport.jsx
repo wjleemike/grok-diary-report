@@ -32,8 +32,8 @@ export default function MarketReport() {
       <section className="mr-section">
         <h2 className="mr-section-title">1. 台股市場概況</h2>
         <div className="index-row">
-          <div className="index-card"><div className="label">{taiex.label}</div><div className="value">{taiex.value}</div><div className={`change ${taiex.direction}`}>{taiex.change}</div></div>
-          <div className="index-card"><div className="label">{tpex.label}</div><div className="value">{tpex.value}</div><div className={`change ${tpex.direction}`}>{tpex.change}</div></div>
+          <div className="index-card"><div className="label">{taiex.label}</div><div className={`value change ${taiex.direction}`}>{taiex.value}</div><div className={`change ${taiex.direction}`}>{taiex.change}</div></div>
+          <div className="index-card"><div className="label">{tpex.label}</div><div className={`value change ${tpex.direction}`}>{tpex.value}</div><div className={`change ${tpex.direction}`}>{tpex.change}</div></div>
         </div>
         <div className="mr-stats-row">
           <div className="mr-stat">上市成交金額 <strong>{volume}</strong></div>
@@ -56,7 +56,7 @@ export default function MarketReport() {
       </section>
       <section className="mr-section">
         <h2 className="mr-section-title">3. 國際市場</h2>
-        <div className="us-markets mr-global">{globalMarkets.map(m=><div key={m.id} className="us-card"><div className="label">{m.label}</div><div className="value">{m.value}</div><div className={`change ${m.direction}`}>{m.change}</div></div>)}</div>
+        <div className="us-markets mr-global">{globalMarkets.map(m=><div key={m.id} className="us-card"><div className="label">{m.label}</div><div className={`value change ${m.direction}`}>{m.value}</div><div className={`change ${m.direction}`}>{m.change}</div></div>)}</div>
       </section>
       <section className="mr-section">
         <h2 className="mr-section-title">4. 持股技術面總覽</h2>

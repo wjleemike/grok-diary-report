@@ -5,7 +5,7 @@ export default function IndexCards() {
       {taiwanIndices.map((item) => (
         <div key={item.id} className="index-card">
           <div className="label">{item.label}</div>
-          <div className="value">{item.value}</div>
+          <div className={`value change ${item.direction}`}>{item.value}</div>
           <div className={`change ${item.direction}`}>{item.change}</div>
         </div>
       ))}
