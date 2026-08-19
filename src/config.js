@@ -1,5 +1,5 @@
 /**
- * 部署 Apps Script 網頁應用後，把網址貼在這裡並重新部署網站。
- * 例：https://script.google.com/macros/s/XXXX/exec
+ * Google Apps Script 網頁應用 — 新增交易紀錄寫入 Sheet
  */
-export const SHEETS_WEBAPP_URL = '';
+export const SHEETS_WEBAPP_URL =
+  'https://script.google.com/macros/s/AKfycbycOnxgT5axHcxoUSmzuYTlRDlvI9HgPM18dcgSCaaaTw_uYoYmSOaV0I2mgLaLfrck/exec';
