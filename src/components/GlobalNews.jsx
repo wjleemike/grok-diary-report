@@ -1,97 +1,64 @@
-function NewsTable({ rows }) {
-  const linkStyle = { color: 'var(--accent)', textDecoration: 'none' };
-  return (
-    <div className="mr-table-wrap">
-      <table className="mr-table">
-        <thead>
-          <tr>
-            <th style={{ textAlign: 'left', whiteSpace: 'nowrap' }}>日期</th>
-            <th style={{ textAlign: 'left' }}>標題</th>
-            <th>重點</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r) => (
-            <tr key={r.href + r.title}>
-              <td style={{ textAlign: 'left', whiteSpace: 'nowrap', color: 'var(--muted)', verticalAlign: 'top' }}>{r.date}</td>
-              <td style={{ textAlign: 'left' }}>
-                <a href={r.href} target="_blank" rel="noopener noreferrer" style={linkStyle}>
-                  {r.title}
-                </a>
-                {r.en && (
-                  <div style={{ fontSize: 12, color: 'var(--muted)', marginTop: 4, lineHeight: 1.45, fontWeight: 400 }}>
-                    {r.en}
-                  </div>
-                )}
-              </td>
-              <td style={{ verticalAlign: 'top' }}>{r.tag}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
+import NewsList from './NewsList.jsx';
 
 const CNN = [
-  { date: '2026/08/18', title: 'Meta 重回法庭，面對最大規模社群成癮訴訟開庭', en: 'Meta back in court as states open the largest social media addiction trial', href: 'https://www.cnn.com/2026/08/18/tech/meta-attorneys-general-addiction-trial-opening-arguments', tag: '科技監管' },
-  { date: '2026/08/18', title: 'Google 收購 Spirit Airlines 全部資料餵養 AI 模型', en: 'Google acquired all of Spirit Airlines’ data to feed its AI models', href: 'https://www.cnn.com/2026/08/18/business/google-spirit-airlines-data', tag: 'AI／資料' },
-  { date: '2026/08/18', title: 'Disney 控告川普 FCC「報復性」行動，捍衛 ABC 執照', en: 'Disney sues Trump’s FCC over “retaliatory” action to defend ABC licenses', href: 'https://www.cnn.com/2026/08/18/media/disney-abc-fcc-trump-lawsuit-the-view-retaliatory', tag: '媒體／監管' },
-  { date: '2026/08/18', title: '荷莫茲海峽石油實際流通量與「暗線」航線變化', en: 'How much oil is actually flowing through the Strait of Hormuz — and the “shadow” routes', href: 'https://www.cnn.com/business', tag: '中東／油價' },
-  { date: '2026/08/18', title: '全球公債大賣壓，殖利率升至多年高點', en: 'Global bond selloff sends yields to multi-year highs', href: 'https://www.cnn.com/business', tag: '債券／利率' },
-  { date: '2026/08/18', title: 'OpenAI 推出 ChatGPT for Teens 加強未成年防護', en: 'OpenAI launches ChatGPT for Teens with stronger teen safety controls', href: 'https://www.cnn.com/2026/08/18/tech/openai-chatgpt-for-teens', tag: 'AI／安全' },
-  { date: '2026/08/17', title: 'AI 財富推升舊金山房市「加價百萬」搶購潮', en: 'AI wealth fuels San Francisco bidding wars with million-dollar overbids', href: 'https://www.cnn.com/2026/08/17/economy/sf-real-estate-ai-wealth', tag: 'AI／房地產' },
-  { date: '2026/08/18', title: '美伊衝突下油價與美國汽油價格追蹤', en: 'Tracking oil and U.S. gasoline prices amid the U.S.–Iran conflict', href: 'https://www.cnn.com/business', tag: '能源' },
-  { date: '2026/08/17', title: '監管單位放行川普相關企業設銀行引爭議', en: 'Regulators greenlight a Trump-linked firm to start a bank, drawing controversy', href: 'https://www.cnn.com/2026/08/17/investing/trump-crypto-bank-world-liberty', tag: '金融監管' },
-  { date: '2026/08/18', title: '人類型機器人製造商中國 IPO 超額認購創紀錄', en: 'Humanoid robot maker’s China IPO is record oversubscribed', href: 'https://www.cnn.com/business', tag: '機器人／IPO' },
+  { date: '2026/08/18', tone: 'bad', title: 'Meta 重回法庭，面對最大規模社群成癮訴訟開庭', en: 'Meta back in court as states open the largest social media addiction trial', href: 'https://www.cnn.com/2026/08/18/tech/meta-attorneys-general-addiction-trial-opening-arguments', tag: '科技監管' },
+  { date: '2026/08/18', tone: 'good', title: 'Google 收購 Spirit Airlines 全部資料餵養 AI 模型', en: 'Google acquired all of Spirit Airlines’ data to feed its AI models', href: 'https://www.cnn.com/2026/08/18/business/google-spirit-airlines-data', tag: 'AI／資料' },
+  { date: '2026/08/18', tone: 'neutral', title: 'Disney 控告川普 FCC「報復性」行動，捍衛 ABC 執照', en: 'Disney sues Trump’s FCC over “retaliatory” action to defend ABC licenses', href: 'https://www.cnn.com/2026/08/18/media/disney-abc-fcc-trump-lawsuit-the-view-retaliatory', tag: '媒體／監管' },
+  { date: '2026/08/18', tone: 'bad', title: '荷莫茲海峽石油實際流通量與「暗線」航線變化', en: 'How much oil is actually flowing through the Strait of Hormuz — and the “shadow” routes', href: 'https://www.cnn.com/business', tag: '中東／油價' },
+  { date: '2026/08/18', tone: 'bad', title: '全球公債大賣壓，殖利率升至多年高點', en: 'Global bond selloff sends yields to multi-year highs', href: 'https://www.cnn.com/business', tag: '債券／利率' },
+  { date: '2026/08/18', tone: 'good', title: 'OpenAI 推出 ChatGPT for Teens 加強未成年防護', en: 'OpenAI launches ChatGPT for Teens with stronger teen safety controls', href: 'https://www.cnn.com/2026/08/18/tech/openai-chatgpt-for-teens', tag: 'AI／安全' },
+  { date: '2026/08/17', tone: 'good', title: 'AI 財富推升舊金山房市「加價百萬」搶購潮', en: 'AI wealth fuels San Francisco bidding wars with million-dollar overbids', href: 'https://www.cnn.com/2026/08/17/economy/sf-real-estate-ai-wealth', tag: 'AI／房地產' },
+  { date: '2026/08/18', tone: 'bad', title: '美伊衝突下油價與美國汽油價格追蹤', en: 'Tracking oil and U.S. gasoline prices amid the U.S.–Iran conflict', href: 'https://www.cnn.com/business', tag: '能源' },
+  { date: '2026/08/17', tone: 'neutral', title: '監管單位放行川普相關企業設銀行引爭議', en: 'Regulators greenlight a Trump-linked firm to start a bank, drawing controversy', href: 'https://www.cnn.com/2026/08/17/investing/trump-crypto-bank-world-liberty', tag: '金融監管' },
+  { date: '2026/08/18', tone: 'good', title: '人類型機器人製造商中國 IPO 超額認購創紀錄', en: 'Humanoid robot maker’s China IPO is record oversubscribed', href: 'https://www.cnn.com/business', tag: '機器人／IPO' },
 ];
 
 const BLOOMBERG = [
-  { date: '2026/08/18', title: '全球公債大賣壓，30 年美債殖利率創 2007 年以來高點', en: 'Global bond rout lifts 30-year U.S. Treasury yield to highest since 2007', href: 'https://www.bloomberg.com/news/articles/2026-08-18/stock-market-today-dow-s-p-live-updates', tag: '債券／利率' },
-  { date: '2026/08/18', title: '晶片股重挫拖累美股，費半大跌近 5%', en: 'Chip stocks drag U.S. equities as the SOX slumps nearly 5%', href: 'https://www.bloomberg.com/news/articles/2026-08-18/stock-market-today-dow-s-p-live-updates', tag: '半導體' },
-  { date: '2026/08/18', title: 'Anthropic 預 IPO 信貸額度上看逾 100 億美元', en: 'Anthropic’s pre-IPO credit facility set to climb past $10 billion', href: 'https://www.bloomberg.com/news/articles/2026-08-18/anthropic-pre-ipo-credit-facility-set-to-climb-past-10-billion', tag: 'AI／融資' },
-  { date: '2026/08/18', title: '美加關稅談判陷入僵局，50% 關稅威脅逼近', en: 'U.S.–Canada tariff talks stall as a 50% tariff threat looms', href: 'https://www.bloomberg.com/', tag: '貿易' },
-  { date: '2026/08/18', title: '川普對伊朗採強硬路線，荷莫茲海峽緊張常態化', en: 'Trump takes a hard line on Iran as Hormuz tensions become the new normal', href: 'https://www.bloomberg.com/', tag: '地緣政治' },
-  { date: '2026/08/18', title: '亞股受美股科技股賣壓影響偏空開盤', en: 'Asian stocks open lower after a U.S. tech selloff', href: 'https://www.bloomberg.com/news/articles/2026-08-18/stock-market-today-dow-s-p-live-updates', tag: '亞洲市場' },
-  { date: '2026/08/18', title: 'Home Depot 財報表現與消費力道觀察', en: 'Home Depot earnings offer a read on consumer spending', href: 'https://www.bloomberg.com/', tag: '消費' },
-  { date: '2026/08/18', title: 'Meta 面臨州檢察長成癮訴訟，可能天價求償', en: 'Meta faces state AGs’ addiction lawsuit that could seek massive damages', href: 'https://www.bloomberg.com/', tag: '科技監管' },
-  { date: '2026/08/18', title: '超高淨值稅務策略與 Schwab／Fidelity 觀望', en: 'Ultra-high-net-worth tax strategies as Schwab and Fidelity stay cautious', href: 'https://www.bloomberg.com/', tag: '財富管理' },
-  { date: '2026/08/18', title: '油價因中東僵局維持高檔', en: 'Oil stays elevated on the Middle East stalemate', href: 'https://www.bloomberg.com/', tag: '能源' },
+  { date: '2026/08/18', tone: 'bad', title: '全球公債大賣壓，30 年美債殖利率創 2007 年以來高點', en: 'Global bond rout lifts 30-year U.S. Treasury yield to highest since 2007', href: 'https://www.bloomberg.com/news/articles/2026-08-18/stock-market-today-dow-s-p-live-updates', tag: '債券／利率' },
+  { date: '2026/08/18', tone: 'bad', title: '晶片股重挫拖累美股，費半大跌近 5%', en: 'Chip stocks drag U.S. equities as the SOX slumps nearly 5%', href: 'https://www.bloomberg.com/news/articles/2026-08-18/stock-market-today-dow-s-p-live-updates', tag: '半導體' },
+  { date: '2026/08/18', tone: 'good', title: 'Anthropic 預 IPO 信貸額度上看逾 100 億美元', en: 'Anthropic’s pre-IPO credit facility set to climb past $10 billion', href: 'https://www.bloomberg.com/news/articles/2026-08-18/anthropic-pre-ipo-credit-facility-set-to-climb-past-10-billion', tag: 'AI／融資' },
+  { date: '2026/08/18', tone: 'bad', title: '美加關稅談判陷入僵局，50% 關稅威脅逼近', en: 'U.S.–Canada tariff talks stall as a 50% tariff threat looms', href: 'https://www.bloomberg.com/', tag: '貿易' },
+  { date: '2026/08/18', tone: 'bad', title: '川普對伊朗採強硬路線，荷莫茲海峽緊張常態化', en: 'Trump takes a hard line on Iran as Hormuz tensions become the new normal', href: 'https://www.bloomberg.com/', tag: '地緣政治' },
+  { date: '2026/08/18', tone: 'bad', title: '亞股受美股科技股賣壓影響偏空開盤', en: 'Asian stocks open lower after a U.S. tech selloff', href: 'https://www.bloomberg.com/news/articles/2026-08-18/stock-market-today-dow-s-p-live-updates', tag: '亞洲市場' },
+  { date: '2026/08/18', tone: 'neutral', title: 'Home Depot 財報表現與消費力道觀察', en: 'Home Depot earnings offer a read on consumer spending', href: 'https://www.bloomberg.com/', tag: '消費' },
+  { date: '2026/08/18', tone: 'bad', title: 'Meta 面臨州檢察長成癮訴訟，可能天價求償', en: 'Meta faces state AGs’ addiction lawsuit that could seek massive damages', href: 'https://www.bloomberg.com/', tag: '科技監管' },
+  { date: '2026/08/18', tone: 'neutral', title: '超高淨值稅務策略與 Schwab／Fidelity 觀望', en: 'Ultra-high-net-worth tax strategies as Schwab and Fidelity stay cautious', href: 'https://www.bloomberg.com/', tag: '財富管理' },
+  { date: '2026/08/18', tone: 'bad', title: '油價因中東僵局維持高檔', en: 'Oil stays elevated on the Middle East stalemate', href: 'https://www.bloomberg.com/', tag: '能源' },
 ];
 
 const FOX = [
-  { date: '2026/08/18', title: '美國國債逼近 40 兆美元，長債殖利率創多年新高', en: 'U.S. national debt nears $40 trillion as long-bond yields hit multi-year highs', href: 'https://www.foxbusiness.com/category/markets', tag: '財政／利率' },
-  { date: '2026/08/18', title: 'David Malpass 警告 AI 循環性與美債風險', en: 'David Malpass warns on the cyclicality of AI and U.S. debt risks', href: 'https://www.foxbusiness.com/category/markets', tag: 'AI／債務' },
-  { date: '2026/08/18', title: 'Meta 被 29 州指控針對青少年成癮設計', en: '29 states accuse Meta of designing Facebook and Instagram to addict children', href: 'https://www.foxbusiness.com/politics/states-accuse-meta-targeting-children-facebook-instagram-addiction-the-young-ones-best-ones', tag: '科技監管' },
-  { date: '2026/08/18', title: 'Amazon／AWS 成長與科技股波動分析', en: 'Amazon/AWS growth versus the latest swing in tech stocks', href: 'https://www.foxbusiness.com/category/markets', tag: '科技股' },
-  { date: '2026/08/17', title: 'L3Harris 因行為調查撤換執行長', en: 'L3Harris ousts CEO Kubasik over a conduct violation', href: 'https://www.foxbusiness.com/markets/l3harris-ousts-ceo-kubasik-over-conduct-violation', tag: '企業治理' },
-  { date: '2026/08/18', title: 'OpenAI 為青少年打造專屬 ChatGPT 體驗', en: 'OpenAI builds a dedicated ChatGPT experience for teens', href: 'https://www.foxbusiness.com/', tag: 'AI／安全' },
-  { date: '2026/08/18', title: '美加關稅談判僵局，50% 關稅威脅', en: 'U.S.–Canada tariff talks deadlock with a 50% tariff threat', href: 'https://www.foxbusiness.com/category/markets', tag: '貿易' },
-  { date: '2026/08/18', title: 'Home Depot 財報：消費者轉向小型居家工程', en: 'Home Depot earnings: consumers shift toward smaller home projects', href: 'https://www.foxbusiness.com/category/markets', tag: '消費' },
-  { date: '2026/08/18', title: '國會民主黨擬推動對阿曼的戰爭權力決議', en: 'Congressional Democrats prepare a war-powers resolution on Oman', href: 'https://www.foxbusiness.com/category/markets', tag: '地緣' },
-  { date: '2026/08/18', title: '能源部推動美國油井自動化增產', en: 'Energy Department pushes automation to boost U.S. oil-well output', href: 'https://www.foxbusiness.com/category/markets', tag: '能源政策' },
+  { date: '2026/08/18', tone: 'bad', title: '美國國債逼近 40 兆美元，長債殖利率創多年新高', en: 'U.S. national debt nears $40 trillion as long-bond yields hit multi-year highs', href: 'https://www.foxbusiness.com/category/markets', tag: '財政／利率' },
+  { date: '2026/08/18', tone: 'bad', title: 'David Malpass 警告 AI 循環性與美債風險', en: 'David Malpass warns on the cyclicality of AI and U.S. debt risks', href: 'https://www.foxbusiness.com/category/markets', tag: 'AI／債務' },
+  { date: '2026/08/18', tone: 'bad', title: 'Meta 被 29 州指控針對青少年成癮設計', en: '29 states accuse Meta of designing Facebook and Instagram to addict children', href: 'https://www.foxbusiness.com/politics/states-accuse-meta-targeting-children-facebook-instagram-addiction-the-young-ones-best-ones', tag: '科技監管' },
+  { date: '2026/08/18', tone: 'neutral', title: 'Amazon／AWS 成長與科技股波動分析', en: 'Amazon/AWS growth versus the latest swing in tech stocks', href: 'https://www.foxbusiness.com/category/markets', tag: '科技股' },
+  { date: '2026/08/17', tone: 'bad', title: 'L3Harris 因行為調查撤換執行長', en: 'L3Harris ousts CEO Kubasik over a conduct violation', href: 'https://www.foxbusiness.com/markets/l3harris-ousts-ceo-kubasik-over-conduct-violation', tag: '企業治理' },
+  { date: '2026/08/18', tone: 'good', title: 'OpenAI 為青少年打造專屬 ChatGPT 體驗', en: 'OpenAI builds a dedicated ChatGPT experience for teens', href: 'https://www.foxbusiness.com/', tag: 'AI／安全' },
+  { date: '2026/08/18', tone: 'bad', title: '美加關稅談判僵局，50% 關稅威脅', en: 'U.S.–Canada tariff talks deadlock with a 50% tariff threat', href: 'https://www.foxbusiness.com/category/markets', tag: '貿易' },
+  { date: '2026/08/18', tone: 'neutral', title: 'Home Depot 財報：消費者轉向小型居家工程', en: 'Home Depot earnings: consumers shift toward smaller home projects', href: 'https://www.foxbusiness.com/category/markets', tag: '消費' },
+  { date: '2026/08/18', tone: 'bad', title: '國會民主黨擬推動對阿曼的戰爭權力決議', en: 'Congressional Democrats prepare a war-powers resolution on Oman', href: 'https://www.foxbusiness.com/category/markets', tag: '地緣' },
+  { date: '2026/08/18', tone: 'good', title: '能源部推動美國油井自動化增產', en: 'Energy Department pushes automation to boost U.S. oil-well output', href: 'https://www.foxbusiness.com/category/markets', tag: '能源政策' },
 ];
 
 export default function GlobalNews() {
   return (
     <div className="market-report">
       <h1 className="main-title">國際財經頭條</h1>
-      <p className="subtitle">資料日期 2026/08/18～19・中文標題下附原文英文・點擊標題開原文</p>
+      <p className="subtitle">資料日期 2026/08/18～19・紅＝好消息、綠＝壞消息・點擊開原文</p>
 
       <section className="mr-section">
         <h2 className="mr-section-title">1. 全球財經頭條（三大媒體精選）</h2>
         <p className="mr-note" style={{ marginBottom: 12 }}>
-          點擊中文標題可開啟原文。每則下方為原始英文標題。
+          點擊卡片開啟原文。中文下方為英文標題。
         </p>
 
         <h3 className="mr-sub">CNN Business</h3>
-        <NewsTable rows={CNN} />
+        <NewsList items={CNN} />
 
         <h3 className="mr-sub">Bloomberg</h3>
-        <NewsTable rows={BLOOMBERG} />
+        <NewsList items={BLOOMBERG} />
 
         <h3 className="mr-sub">Fox Business</h3>
-        <NewsTable rows={FOX} />
+        <NewsList items={FOX} />
       </section>
 
       <section className="mr-section">
