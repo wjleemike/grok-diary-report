@@ -61,7 +61,8 @@ export default function AddTrade() {
     };
 
     setLoading(true);
-    setMsg('送出中…');
+    setMsg('寫入中（約 3–8 秒）…');
+    const started = Date.now();
     try {
       const qs = new URLSearchParams({
         action: 'append',
@@ -79,18 +80,23 @@ export default function AddTrade() {
         result = null;
       }
 
-      if (result && result.ok && (result.id != null || result.sheet)) {
-        setMsg(`已寫入 Google Sheet（列編號 ${result.id}／分頁 ${result.sheet || '交易紀錄'}${result.name ? '／' + result.name : ''}）`);
+      const sec = ((Date.now() - started) / 1000).toFixed(1);
+      if (result && result.ok && result.id != null) {
+        setMsg(`已寫入（編號 ${result.id}／${result.sheet || '交易紀錄'}／${result.name || resolvedName}，${sec}s）`);
         setShares('');
         setPrice('');
         setReason('');
       } else if (result && result.ok && result.service) {
-        setMsg('腳本仍是舊版。請更新 Code.gs 並部署新版本（需 version: 8）。');
+        setMsg('腳本不是 v9。請貼上最新 Code.gs 並部署「新版本」，/exec 需顯示 version:9');
       } else {
-        setMsg('送出失敗：' + (result?.error || text.slice(0, 160) || '未知錯誤'));
+        setMsg('送出失敗：' + (result?.error || text.slice(0, 120) || '未知'));
       }
     } catch (err) {
-      setMsg('送出失敗：' + (err?.message || String(err)));
+      setMsg(
+        '回應逾時或網路中斷。請直接看試算表是否已多一列；若有即寫入成功。(' +
+          (err?.message || '') +
+          ')',
+      );
     } finally {
       setLoading(false);
     }
@@ -100,7 +106,7 @@ export default function AddTrade() {
     <div className="market-report" style={{ maxWidth: 520 }}>
       <p className="section-label">PORTFOLIO TRADE LOG</p>
       <h1 className="main-title">新增交易紀錄</h1>
-      <p className="subtitle">送出後寫入 Google Sheet「交易紀錄」</p>
+      <p className="subtitle">編號 = 最後編號+1；名稱由代號自動帶入</p>
 
       <form
         onSubmit={handleSubmit}
@@ -128,7 +134,7 @@ export default function AddTrade() {
           style={inputStyle}
         />
 
-        <label className="mr-note" style={{ display: 'block', marginTop: 14, marginBottom: 6 }}>股票名稱（輸入代號自動帶入，可改）</label>
+        <label className="mr-note" style={{ display: 'block', marginTop: 14, marginBottom: 6 }}>股票名稱（自動帶入）</label>
         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="例如 台積電" style={inputStyle} />
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, margin: '14px 0' }}>
@@ -156,14 +162,11 @@ export default function AddTrade() {
           <>
             <label className="mr-note" style={{ display: 'block', marginTop: 14, marginBottom: 6 }}>配股股數</label>
             <input value={shares} onChange={(e) => setShares(e.target.value)} type="number" min="0" step="1" style={inputStyle} />
-            <p className="mr-note" style={{ marginTop: 6, fontSize: 11 }}>
-              配股會按現有均價自動稀釋（股數增加、總成本不變），不用填價格
-            </p>
           </>
         ) : isCashDiv ? (
           <>
             <label className="mr-note" style={{ display: 'block', marginTop: 14, marginBottom: 6 }}>現金股利金額</label>
-            <input value={price} onChange={(e) => setPrice(e.target.value)} type="number" min="0" step="0.01" placeholder="例如 1500" style={inputStyle} />
+            <input value={price} onChange={(e) => setPrice(e.target.value)} type="number" min="0" step="0.01" style={inputStyle} />
           </>
         ) : (
           <>
@@ -175,10 +178,10 @@ export default function AddTrade() {
         )}
 
         <label className="mr-note" style={{ display: 'block', marginTop: 14, marginBottom: 6 }}>決策原因（選填）</label>
-        <textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} style={{ ...inputStyle, resize: 'vertical', minHeight: 72 }} />
+        <textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={2} style={{ ...inputStyle, resize: 'vertical', minHeight: 56 }} />
 
         {msg && (
-          <p className="mr-note" style={{ marginTop: 12, color: msg.includes('失敗') || msg.includes('舊版') ? '#f87171' : 'var(--teal, #14b8a6)' }}>
+          <p className="mr-note" style={{ marginTop: 12, color: msg.includes('失敗') || msg.includes('不是') ? '#f87171' : 'var(--teal, #14b8a6)' }}>
             {msg}
           </p>
         )}
@@ -200,7 +203,7 @@ export default function AddTrade() {
             opacity: loading ? 0.7 : 1,
           }}
         >
-          {loading ? '送出中…' : '送出'}
+          {loading ? '寫入中…' : '送出'}
         </button>
       </form>
     </div>
