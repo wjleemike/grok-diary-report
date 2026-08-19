@@ -11,6 +11,8 @@ import GlobalNews from './components/GlobalNews.jsx';
 import TaiwanAINews from './components/TaiwanAINews.jsx';
 import PortfolioPnL from './components/PortfolioPnL.jsx';
 import HoldingsStatus from './components/HoldingsStatus.jsx';
+import AddTrade from './components/AddTrade.jsx';
+import TradeHistory from './components/TradeHistory.jsx';
 import { lastUpdate, reportDate, totalHoldings, holdings } from './data/mockData.js';
 
 function App() {
@@ -31,6 +33,10 @@ function App() {
           <PortfolioPnL />
         ) : view === 'status' ? (
           <HoldingsStatus />
+        ) : view === 'add' ? (
+          <AddTrade />
+        ) : view === 'history' ? (
+          <TradeHistory />
         ) : (
           <>
             <p className="update-time">上次更新:{lastUpdate}</p>
