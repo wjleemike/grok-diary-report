@@ -4,21 +4,23 @@
  * 設定：
  * 1. 貼上本檔 → 儲存
  * 2. 部署 → 管理部署 → 編輯 → 版本選「新版本」→ 部署
- *    （或新增部署：網頁應用程式 / 執行身分：我 / 任何人）
- * 3. 網址維持貼在網站 src/config.js
+ *    （執行身分：我 / 存取權：任何人）
  *
  * 寫入方式：GET ?action=append&payload=<URL-encoded JSON>
  */
 
 var SPREADSHEET_ID = '14ZGEQp3AkQIPx2fOEUyZy11sNpEr4mhGkP6Ei3RNs4w';
-var SHEET_GID = 593571516;
-var SHEET_NAME = ''; // 可改成實際分頁名稱，例如「交易明細」
+var SHEET_GID = 593571516; // 備用：找不到名稱時用 gid
+var SHEET_NAME = '交易紀錄'; // 寫入此分頁
 
 function getTargetSheet_() {
   var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   if (SHEET_NAME) {
     var byName = ss.getSheetByName(SHEET_NAME);
     if (byName) return byName;
+    // 若找不到「交易紀錄」，嘗試常見別名
+    var alt = ss.getSheetByName('交易明細') || ss.getSheetByName('交易記錄');
+    if (alt) return alt;
   }
   var sheets = ss.getSheets();
   for (var i = 0; i < sheets.length; i++) {
@@ -97,7 +99,7 @@ function doGet(e) {
       return json_(result);
     }
 
-    return json_({ ok: true, service: 'grok-trade-log', hint: 'use ?action=append&payload=JSON' });
+    return json_({ ok: true, service: 'grok-trade-log', target: SHEET_NAME, hint: 'use ?action=append&payload=JSON' });
   } catch (err) {
     return json_({ ok: false, error: String(err) });
   }
