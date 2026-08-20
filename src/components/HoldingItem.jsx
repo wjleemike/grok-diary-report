@@ -8,6 +8,10 @@ function formatPrice(price) {
   if (price === null || price === undefined) return '—';
   return price % 1 === 0 ? price.toString() : Number(price).toFixed(2);
 }
+function maClass(price, ma) {
+  if (ma === null || ma === undefined || price === null || price === undefined) return '';
+  return price >= ma ? 'up' : 'down';
+}
 
 const SIGNAL_RULE = {
   green: '未實現損益率 ≥ +15%：趨勢偏多，可持續持有或分批加碼觀察',
@@ -19,6 +23,7 @@ export default function HoldingItem({ holding }) {
   const [open, setOpen] = useState(false);
   const isPositive = holding.changePct >= 0;
   const signalLabel = { green: '綠燈', yellow: '黃燈', red: '紅燈' }[holding.signal];
+  const hasMA = holding.ma5 != null || holding.ma20 != null || holding.ma60 != null;
 
   return (
     <div
@@ -39,7 +44,9 @@ export default function HoldingItem({ holding }) {
           <div className={`holding-bar ${holding.signal}`} />
           <div className="holding-info">
             <div className="name">
-              {holding.name} <span className="tag">{holding.tag}</span>
+              {holding.name}{' '}
+              {holding.code ? <span className="tag">{holding.code}</span> : null}
+              <span className="tag">{holding.tag}</span>
             </div>
             <div className="meta">
               {holding.market} · 持有 {formatNumber(holding.shares)} 股
@@ -78,6 +85,33 @@ export default function HoldingItem({ holding }) {
               {holding.reason || SIGNAL_RULE[holding.signal]}
             </span>
           </div>
+
+          {hasMA && (
+            <div className="detail-grid" style={{ marginBottom: 12 }}>
+              <div>
+                <span className="detail-label">MA5（5日）</span>
+                <span className={`detail-value ${maClass(holding.price, holding.ma5)}`}>
+                  {formatPrice(holding.ma5)}
+                  {holding.ma5 != null ? (holding.price >= holding.ma5 ? ' ▲' : ' ▼') : ''}
+                </span>
+              </div>
+              <div>
+                <span className="detail-label">MA20（月線）</span>
+                <span className={`detail-value ${maClass(holding.price, holding.ma20)}`}>
+                  {formatPrice(holding.ma20)}
+                  {holding.ma20 != null ? (holding.price >= holding.ma20 ? ' ▲' : ' ▼') : ''}
+                </span>
+              </div>
+              <div>
+                <span className="detail-label">MA60（季線）</span>
+                <span className={`detail-value ${maClass(holding.price, holding.ma60)}`}>
+                  {formatPrice(holding.ma60)}
+                  {holding.ma60 != null ? (holding.price >= holding.ma60 ? ' ▲' : ' ▼') : ''}
+                </span>
+              </div>
+            </div>
+          )}
+
           <div className="detail-grid">
             <div>
               <span className="detail-label">判定規則</span>
@@ -120,6 +154,9 @@ export default function HoldingItem({ holding }) {
               <span className="detail-value">{holding.note}</span>
             </div>
           )}
+          <p className="detail-value muted" style={{ marginTop: 8, fontSize: 11 }}>
+            均線以 Yahoo Finance 近約 4 個月日線收盤價計算（SMA）；▲ 現價≥均線、▼ 現價<均線。非投資建議。
+          </p>
         </div>
       )}
     </div>
