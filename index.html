@@ -85,11 +85,7 @@ body{font-family:Inter,Noto Sans TC,system-ui,sans-serif;background:var(--bg);co
 .news-item.bad .news-en{color:rgba(34,197,94,.8)}
 .news-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px;font-size:13px;color:var(--dim)}
 .news-tag{background:#1e293b;padding:2px 8px;border-radius:999px;font-size:12px}
-@media(max-width:768px){
-  .news-title{font-size:16px}
-  .news-en{font-size:14px}
-  .news-item{padding:14px 12px}
-}
+@media(max-width:768px){.news-title{font-size:16px}.news-en{font-size:14px}.news-item{padding:14px 12px}}
 .mr-global{grid-template-columns:repeat(4,1fr)!important}
 .mr-tech-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:12px}
 .mr-tech-col{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;min-height:120px}
@@ -104,6 +100,28 @@ body{font-family:Inter,Noto Sans TC,system-ui,sans-serif;background:var(--bg);co
 .mr-tech-industry{font-size:11px;font-weight:600;color:var(--accent);margin:8px 0 4px;padding-top:4px;border-top:1px solid var(--border)}
 .mr-tech-group:first-child .mr-tech-industry{border-top:none;padding-top:0;margin-top:0}
 @media(max-width:768px){.index-row,.us-markets,.light-stats,.summary-row{grid-template-columns:1fr}.us-markets{grid-template-columns:1fr 1fr}.holding-item{flex-direction:column;align-items:flex-start;gap:12px}.holding-right{width:100%;justify-content:space-between}.mr-sectors,.mr-tech-grid,.mr-global{grid-template-columns:1fr!important}}
+.light-stats-wrap{margin-bottom:16px}
+.signal-legend{margin-top:12px;padding:12px 16px;background:var(--card);border:1px solid var(--border);border-radius:12px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+.legend-item{display:flex;align-items:center;gap:8px}
+.legend-item strong{color:var(--text)}
+.legend-hint{margin:6px 0 0;font-size:12px;color:var(--accent)}
+.holding-item{flex-direction:column;align-items:stretch;gap:0;padding:0!important}
+.holding-main{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;width:100%}
+.holding-item.expanded{border-color:#3b4a63;background:#1f2a3d}
+.arrow{transition:transform .2s;display:inline-block}
+.arrow.open{transform:rotate(90deg);color:var(--accent)}
+.holding-detail{border-top:1px solid var(--border);padding:14px 18px 16px;background:rgba(0,0,0,.25);font-size:13px}
+.detail-row{margin-bottom:10px}
+.detail-row.signal-reason .detail-value strong.green{color:var(--green)}
+.detail-row.signal-reason .detail-value strong.yellow{color:var(--yellow)}
+.detail-row.signal-reason .detail-value strong.red{color:var(--red)}
+.detail-label{display:block;font-size:11px;color:var(--dim);margin-bottom:2px;text-transform:uppercase;letter-spacing:.03em}
+.detail-value{color:var(--text);line-height:1.45}
+.detail-value.muted{color:var(--muted);font-size:12px}
+.detail-value.up{color:var(--reds)}
+.detail-value.down{color:var(--green)}
+.detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 16px;margin-top:4px}
+@media(max-width:768px){.detail-grid{grid-template-columns:1fr 1fr}.holding-main{flex-direction:column;align-items:flex-start;gap:12px}.holding-right{width:100%;justify-content:space-between}}
 </style>
 </head>
 <body>
