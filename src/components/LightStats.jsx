@@ -16,17 +16,17 @@ export default function LightStats({ stats }) {
       <div className="signal-legend">
         <div className="legend-item">
           <span className="dot green" />
-          <span><strong>綠燈</strong>：未實現 ≥ +15% <em>且</em> 現價站上 MA20（損益＋均線雙重偏多）</span>
+          <span><strong>綠燈</strong>：四項條件偏多 ≥ 3 <em>且</em> 股價站上 MA20（短中期偏多）</span>
         </div>
         <div className="legend-item">
           <span className="dot yellow" />
-          <span><strong>黃燈</strong>：損益與均線未同時達標（背離或整理，以觀望為主）</span>
+          <span><strong>黃燈</strong>：均線／五日動能／量能未同步（整理或背離，觀望）</span>
         </div>
         <div className="legend-item">
           <span className="dot red" />
-          <span><strong>紅燈</strong>：未實現 {'<'} -5% <em>且</em> 現價低於 MA20 與 MA60（雙重偏空）</span>
+          <span><strong>紅燈</strong>：四項條件偏空 ≥ 3 <em>且</em> 股價低於 MA20（短中期偏空）</span>
         </div>
-        <p className="legend-hint">點擊個股右側 › 可展開損益偏向、均線偏向與 MA5/MA20/MA60 真實計算</p>
+        <p className="legend-hint">四項：股價 vs MA20、MA20 vs MA60、近 5 日漲跌、量比。點擊 › 展開明細</p>
       </div>
     </div>
   );

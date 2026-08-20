@@ -43,7 +43,7 @@ function App() {
             <p className="update-time">上次更新:{lastUpdate}</p>
             <div className="section-label">DAILY PORTFOLIO SIGNAL</div>
             <h1 className="main-title">Grok每日報告</h1>
-            <p className="subtitle">{reportDate} 收盤資料 • 共 {totalHoldings} 檔持股 • 燈號＝損益 × 均線</p>
+            <p className="subtitle">{reportDate} 收盤資料 • 共 {totalHoldings} 檔持股 • 燈號＝均線 × 動能 × 量能</p>
             <IndexCards />
             <UsMarkets />
             <LightStats stats={liveStats} />

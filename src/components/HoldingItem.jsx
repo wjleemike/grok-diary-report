@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { computeSignal, SIGNAL_RULE, SIGNAL_LABEL, BIAS_LABEL } from '../utils/signal.js';
+import { computeSignal, SIGNAL_RULE, SIGNAL_LABEL } from '../utils/signal.js';
 
 function formatNumber(num) {
   if (num === null || num === undefined) return '—';
@@ -185,7 +185,7 @@ export default function HoldingItem({ holding }) {
       {open && (
         <div className="holding-detail" onClick={(e) => e.stopPropagation()}>
           <div className="detail-row signal-reason">
-            <span className="detail-label">燈號說明（損益 × 均線）</span>
+            <span className="detail-label">燈號說明（均線 × 動能 × 量能）</span>
             <span className="detail-value">
               <strong className={signal}>{signalLabel}</strong>
               {' — '}
@@ -193,31 +193,19 @@ export default function HoldingItem({ holding }) {
             </span>
           </div>
 
+          <ul className="factor-list">
+            {(judged.factors || []).map((f) => (
+              <li key={f.id} className={`factor-item bias-${f.bias}`}>
+                <span className="factor-dot">●</span>
+                <span className="factor-text">{f.text}</span>
+              </li>
+            ))}
+          </ul>
+
           <div className="detail-grid">
             <div>
               <span className="detail-label">判定規則</span>
               <span className="detail-value muted">{SIGNAL_RULE[signal]}</span>
-            </div>
-            <div>
-              <span className="detail-label">損益偏向</span>
-              <span className={`detail-value bias-${judged.pnlBias}`}>
-                {BIAS_LABEL[judged.pnlBias]}
-                {' '}
-                （{isPositive ? '+' : ''}{holding.changePct.toFixed(2)}%）
-              </span>
-            </div>
-            <div>
-              <span className="detail-label">均線偏向</span>
-              <span className={`detail-value bias-${judged.maBias}`}>
-                {BIAS_LABEL[judged.maBias]}
-                {judged.ma.hasData
-                  ? judged.ma.above20
-                    ? '（站上 MA20）'
-                    : judged.ma.above60
-                      ? '（低於 MA20、站上 MA60）'
-                      : '（低於 MA20／MA60）'
-                  : ''}
-              </span>
             </div>
             <div>
               <span className="detail-label">產業／類型</span>
@@ -233,6 +221,20 @@ export default function HoldingItem({ holding }) {
                 {isPositive ? '+' : ''}
                 {formatNumber(holding.dailyPnl)}（{isPositive ? '+' : ''}
                 {holding.changePct.toFixed(2)}%）
+              </span>
+            </div>
+            <div>
+              <span className="detail-label">近 5 日</span>
+              <span className="detail-value">
+                {holding.chg5d == null
+                  ? '—'
+                  : `${holding.chg5d >= 0 ? '+' : ''}${Number(holding.chg5d).toFixed(2)}%`}
+              </span>
+            </div>
+            <div>
+              <span className="detail-label">量比</span>
+              <span className="detail-value">
+                {holding.volRatio == null ? '—' : `${Number(holding.volRatio).toFixed(2)} 倍`}
               </span>
             </div>
           </div>
@@ -301,7 +303,7 @@ export default function HoldingItem({ holding }) {
           )}
 
           <p className="detail-value muted" style={{ marginTop: 10, fontSize: 11 }}>
-            燈號採雙重確認：綠燈需「未實現 ≥ +15%」且「現價 ≥ MA20」；紅燈需「未實現 < -5%」且「現價低於 MA20 與 MA60」。均線為近約 4 個月日線 SMA。非投資建議。
+            燈號依四項技術條件：股價 vs MA20、MA20 vs MA60、近 5 日漲跌、量比（近 1 日／近 20 日均量）。綠燈需偏多 ≥ 3 且站上月線；紅燈需偏空 ≥ 3 且跌破月線。非投資建議。
           </p>
         </div>
       )}

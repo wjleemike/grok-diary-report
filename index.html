@@ -143,6 +143,16 @@ body{font-family:Inter,Noto Sans TC,system-ui,sans-serif;background:var(--bg);co
 .detail-value.bias-bear{color:var(--red);font-weight:600}
 .detail-value.bias-side{color:var(--yellow);font-weight:600}
 .signal-legend em{color:var(--accent);font-style:normal;font-weight:600}
+.factor-list{list-style:none;margin:8px 0 14px;padding:10px 12px;background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:10px;display:flex;flex-direction:column;gap:6px}
+.factor-item{display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.45}
+.factor-dot{flex-shrink:0;margin-top:1px}
+.factor-item.bias-bull{color:var(--green)}
+.factor-item.bias-bear{color:var(--red)}
+.factor-item.bias-side{color:var(--yellow)}
+.factor-text{color:var(--text)}
+.factor-item.bias-bull .factor-text{color:#86efac}
+.factor-item.bias-bear .factor-text{color:#fca5a5}
+.factor-item.bias-side .factor-text{color:#fde68a}
 .ma-advice{display:block;margin-top:4px;line-height:1.55;color:var(--text)}
 @media(max-width:768px){.ma-grid{grid-template-columns:1fr}}
 
