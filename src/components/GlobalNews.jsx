@@ -59,10 +59,10 @@ export default function GlobalNews({ news, usMarkets, reportDate, live }) {
       <section className="mr-section">
         <h2 className="mr-section-title">1. 全球財經頭條（三大媒體精選）</h2>
         <p className="mr-note" style={{ marginBottom: 12 }}>
-          點擊卡片開啟原文。每則標題皆為繁體中文；若有英文原文會顯示在下方。可用右上角「立即更新」重抓並自動翻譯。
+          點擊卡片開啟原文。每則標題皆為繁體中文；若有英文原文會顯示在下方。CNN 固定列出 10 則重大財經／地緣新聞。可用右上角「立即更新」重抓並自動翻譯。
         </p>
 
-        <h3 className="mr-sub">CNN Business</h3>
+        <h3 className="mr-sub">CNN（10 則重大新聞）</h3>
         <NewsList items={cnn} />
 
         <h3 className="mr-sub">Bloomberg</h3>

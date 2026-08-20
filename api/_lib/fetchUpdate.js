@@ -375,6 +375,84 @@ function gnews(q, hl = 'zh-TW', gl = 'TW', ceid = 'TW:zh-Hant') {
   return `https://news.google.com/rss/search?q=${encodeURIComponent(q)}&hl=${hl}&gl=${gl}&ceid=${encodeURIComponent(ceid)}`;
 }
 
+const CNN_SKIP_RE =
+  /underscored|dyson|crocs|haveli|recipe|curly hair|fashion|coachella|playboy|cocktail|helipad|ballroom|snowplow|tiktok|potato|grenade|mansion|straighten/i;
+
+const CNN_MAJOR_RE =
+  /Iran|Hormuz|oil|Fed|rate|debt|tariff|stock|market|econom|China|Taiwan|TSMC|Nvidia|AI\b|war|semiconductor|inflation|jobs|GDP|Treasury|bond|recession|bank|Trump|energy|trade|missile|UAE|OpenAI|Meta|Apple|Google|Microsoft|Evergrande|consumer|retail|Canada/i;
+
+function cnnTag(title) {
+  const t = title || '';
+  if (/Iran|Hormuz|oil|energy|gas/i.test(t)) return '中東／油價';
+  if (/debt|Treasury|bond|yield/i.test(t)) return '財政';
+  if (/tariff|trade|Canada/i.test(t)) return '貿易';
+  if (/Fed|rate|inflation/i.test(t)) return '利率';
+  if (/AI|OpenAI|Nvidia|semiconductor|TSMC|chip/i.test(t)) return 'AI／半導體';
+  if (/stock|market|S&P|Nasdaq|Dow/i.test(t)) return '美股';
+  if (/war|missile|military|wounded/i.test(t)) return '地緣';
+  if (/China|Taiwan|Evergrande/i.test(t)) return '中國／亞洲';
+  if (/Meta|Apple|Google|tech/i.test(t)) return '科技';
+  if (/econom|GDP|jobs|consumer|retail/i.test(t)) return '經濟';
+  return 'CNN';
+}
+
+function newsDedupeKey(title) {
+  return String(title || '')
+    .toLowerCase()
+    .replace(/['’]/g, '')
+    .replace(/[^a-z0-9\u4e00-\u9fff]+/g, ' ')
+    .trim()
+    .slice(0, 72);
+}
+
+function scoreCnnItem(it) {
+  const t = `${it.title || ''} ${it.href || ''}`;
+  if (CNN_SKIP_RE.test(t)) return -100;
+  if (/White House (vision|construction)|helipad|ballroom|special stone/i.test(t)) return -20;
+  let s = 1;
+  if (CNN_MAJOR_RE.test(t)) s += 6;
+  if (/Iran|Hormuz|oil|tariff|debt|Fed|Taiwan|TSMC|Evergrande/i.test(t)) s += 5;
+  if (/\/business\/|\/economy\/|\/markets\//i.test(it.href || '')) s += 2;
+  return s;
+}
+
+function pickMajorNews(items, n = 10) {
+  const seen = new Set();
+  const scored = [];
+  for (const it of items) {
+    const k = newsDedupeKey(it.title);
+    if (!k || seen.has(k)) continue;
+    seen.add(k);
+    const sc = scoreCnnItem(it);
+    if (sc < 0) continue;
+    scored.push({ it: { ...it, tag: cnnTag(it.title) }, sc });
+  }
+  scored.sort((a, b) => b.sc - a.sc);
+  return scored.slice(0, n).map((x) => x.it);
+}
+
+/** CNN：合併多組 Google News，篩重大財經／地緣，固定回傳 10 則 */
+async function fetchCnnMajor() {
+  const en = (q) => gnews(q, 'en-US', 'US', 'US:en');
+  const lists = await Promise.all([
+    fetchRss(
+      en('site:cnn.com (Iran OR Hormuz OR oil OR Fed OR tariff OR debt OR stocks OR markets OR economy)'),
+      25
+    ).catch(() => []),
+    fetchRss(
+      en('site:cnn.com (China OR Taiwan OR AI OR semiconductor OR Nvidia OR Trump OR war)'),
+      20
+    ).catch(() => []),
+    fetchRss(en('site:cnn.com (business OR markets OR economy)'), 15).catch(() => []),
+  ]);
+  let picked = pickMajorNews(lists.flat(), 10);
+  if (picked.length >= 10) return picked;
+  const extra = await fetchRss(en('site:cnn.com'), 40).catch(() => []);
+  picked = pickMajorNews([...picked, ...extra], 10);
+  return picked;
+}
+
+
 async function fetchUsIndices() {
   const url =
     'https://query1.finance.yahoo.com/v7/finance/spark?symbols=%5EGSPC,%5EIXIC,%5EDJI,%5ESOX&range=5d&interval=1d';
@@ -430,7 +508,7 @@ export async function fetchMarketUpdate(body = {}) {
     fetchMisPrices(wanted).catch(() => ({})),
     fetchRss(gnews('台股 OR 加權指數 OR 台積電'), 10).catch(() => []),
     fetchRss(gnews('AI OR Nvidia OR OpenAI OR 輝達 OR 人工智慧'), 10).catch(() => []),
-    fetchRss(gnews('site:cnn.com (business OR markets OR economy)'), 10).catch(() => []),
+    fetchCnnMajor().catch(() => []),
     fetchRss(gnews('site:bloomberg.com (markets OR stocks OR AI)'), 10).catch(() => []),
     fetchRss(gnews('site:foxbusiness.com')).then((list) =>
       list.length
