@@ -8,22 +8,137 @@ function formatPrice(price) {
   if (price === null || price === undefined) return '—';
   return price % 1 === 0 ? price.toString() : Number(price).toFixed(2);
 }
-function maClass(price, ma) {
-  if (ma === null || ma === undefined || price === null || price === undefined) return '';
-  return price >= ma ? 'up' : 'down';
-}
 
 const SIGNAL_RULE = {
   green: '未實現損益率 ≥ +15%：趨勢偏多，可持續持有或分批加碼觀察',
   yellow: '未實現損益率介於 -5%～+15%：震盪整理，以觀望為主',
-  red: '未實現損益率低於 -5%：壓力較大，建議檢視停損或減碼',
+  red: '未實現損益率 < -5%：壓力較大，建議檢視停損或減碼',
 };
+
+/**
+ * 真實 MA 數值計算
+ * 依現價與 MA5 / MA20 / MA60 動態判斷：
+ * - 站上 / 低於 各均線
+ * - 多頭 / 空頭 / 糾結 排列
+ * - 產出對應技術建議
+ */
+function computeMaAnalysis(price, ma5, ma20, ma60) {
+  if (
+    price == null ||
+    ma5 == null ||
+    ma20 == null ||
+    ma60 == null ||
+    Number.isNaN(Number(price)) ||
+    Number.isNaN(Number(ma5)) ||
+    Number.isNaN(Number(ma20)) ||
+    Number.isNaN(Number(ma60))
+  ) {
+    return {
+      hasData: false,
+      above5: false,
+      above20: false,
+      above60: false,
+      arrangement: '—',
+      advice: '尚無足夠均線資料，無法計算技術建議。',
+      statusText: '資料不足',
+    };
+  }
+
+  const p = Number(price);
+  const m5 = Number(ma5);
+  const m20 = Number(ma20);
+  const m60 = Number(ma60);
+
+  const above5 = p >= m5;
+  const above20 = p >= m20;
+  const above60 = p >= m60;
+
+  // 排列判斷（嚴格）
+  let arrangement = '均線糾結／震盪';
+  if (m5 > m20 && m20 > m60 && above5) {
+    arrangement = '多頭排列';
+  } else if (m5 < m20 && m20 < m60 && !above5) {
+    arrangement = '空頭排列';
+  }
+
+  // 站上／低於文字
+  const aboveList = [];
+  const belowList = [];
+  if (above5) aboveList.push('MA5');
+  else belowList.push('MA5');
+  if (above20) aboveList.push('MA20');
+  else belowList.push('MA20');
+  if (above60) aboveList.push('MA60');
+  else belowList.push('MA60');
+
+  let statusText = '';
+  if (aboveList.length === 3) {
+    statusText = `站上 ${aboveList.join(',')}`;
+  } else if (belowList.length === 3) {
+    statusText = `低於 ${belowList.join(',')}`;
+  } else {
+    statusText =
+      (aboveList.length ? `站上 ${aboveList.join(',')}` : '') +
+      (aboveList.length && belowList.length ? '；' : '') +
+      (belowList.length ? `低於 ${belowList.join(',')}` : '');
+  }
+
+  // 建議邏輯（與先前手動撰寫的語意對齊，改為真實計算）
+  let advice = `現價 ${formatPrice(p)}：${statusText}。`;
+
+  if (above5 && above20 && above60) {
+    if (m5 >= m20 && m20 >= m60) {
+      advice +=
+        '多頭排列；短均在中均之上，動能偏多；可沿 MA20 移動停利，回測不破續抱。';
+    } else {
+      advice +=
+        '三條均線之上，但均線尚未完全多頭排列；續抱為主，留意均線糾結後方向。';
+    }
+  } else if (!above5 && !above20 && !above60) {
+    advice +=
+      '空頭或弱勢；宜等收復 MA20 或出現止跌再評估，否則優先控風險減碼。';
+  } else if (above20 && above60 && !above5) {
+    advice += '短線弱於 MA5，先觀察能否站回；中期仍站上月線與季線，偏多整理。';
+  } else if (above60 && !above20) {
+    advice +=
+      '尚未站穩月線(MA20)，宜觀望；突破 MA20 帶量再偏多。';
+  } else if (above5 && above20 && !above60) {
+    advice +=
+      '短中期偏強但尚未站上季線；均線糾結或震盪，突破/跌破 MA20 再決定加減碼。';
+  } else if (!above5 && above20) {
+    advice +=
+      '短線弱於 MA5，但站上 MA20；先觀察能否站回 MA5，回測 MA20 不破可續抱。';
+  } else {
+    advice +=
+      '均線糾結或震盪，突破/跌破 MA20 再決定加減碼。';
+  }
+
+  return {
+    hasData: true,
+    above5,
+    above20,
+    above60,
+    arrangement,
+    advice,
+    statusText,
+    m5,
+    m20,
+    m60,
+    p,
+  };
+}
 
 export default function HoldingItem({ holding }) {
   const [open, setOpen] = useState(false);
   const isPositive = holding.changePct >= 0;
   const signalLabel = { green: '綠燈', yellow: '黃燈', red: '紅燈' }[holding.signal];
-  const hasMA = holding.ma5 != null || holding.ma20 != null || holding.ma60 != null;
+
+  const ma = computeMaAnalysis(
+    holding.price,
+    holding.ma5,
+    holding.ma20,
+    holding.ma60
+  );
 
   return (
     <div
@@ -44,12 +159,10 @@ export default function HoldingItem({ holding }) {
           <div className={`holding-bar ${holding.signal}`} />
           <div className="holding-info">
             <div className="name">
-              {holding.name}{' '}
-              {holding.code ? <span className="tag">{holding.code}</span> : null}
-              <span className="tag">{holding.tag}</span>
+              {holding.name} <span className="tag">{holding.tag}</span>
             </div>
             <div className="meta">
-              {holding.market} · 持有 {formatNumber(holding.shares)} 股
+              {holding.market} • 持有 {formatNumber(holding.shares)} 股
               <br />
               市值 {formatNumber(holding.marketValue)}
             </div>
@@ -86,32 +199,6 @@ export default function HoldingItem({ holding }) {
             </span>
           </div>
 
-          {hasMA && (
-            <div className="detail-grid" style={{ marginBottom: 12 }}>
-              <div>
-                <span className="detail-label">MA5（5日）</span>
-                <span className={`detail-value ${maClass(holding.price, holding.ma5)}`}>
-                  {formatPrice(holding.ma5)}
-                  {holding.ma5 != null ? (holding.price >= holding.ma5 ? ' ▲' : ' ▼') : ''}
-                </span>
-              </div>
-              <div>
-                <span className="detail-label">MA20（月線）</span>
-                <span className={`detail-value ${maClass(holding.price, holding.ma20)}`}>
-                  {formatPrice(holding.ma20)}
-                  {holding.ma20 != null ? (holding.price >= holding.ma20 ? ' ▲' : ' ▼') : ''}
-                </span>
-              </div>
-              <div>
-                <span className="detail-label">MA60（季線）</span>
-                <span className={`detail-value ${maClass(holding.price, holding.ma60)}`}>
-                  {formatPrice(holding.ma60)}
-                  {holding.ma60 != null ? (holding.price >= holding.ma60 ? ' ▲' : ' ▼') : ''}
-                </span>
-              </div>
-            </div>
-          )}
-
           <div className="detail-grid">
             <div>
               <span className="detail-label">判定規則</span>
@@ -142,20 +229,73 @@ export default function HoldingItem({ holding }) {
               </span>
             </div>
           </div>
-          {holding.maAdvice && (
-            <div className="detail-row">
-              <span className="detail-label">均線分析建議</span>
-              <span className="detail-value">{holding.maAdvice}</span>
+
+          {/* ===== 真實 MA 計算區塊 ===== */}
+          <div className="ma-section">
+            <div className="detail-label" style={{ marginBottom: 8 }}>
+              均線分析（真實計算）
             </div>
-          )}
+
+            {ma.hasData ? (
+              <>
+                <div className="ma-grid">
+                  <div className={`ma-item ${ma.above5 ? 'above' : 'below'}`}>
+                    <div className="ma-name">MA5</div>
+                    <div className="ma-value">{formatPrice(ma.m5)}</div>
+                    <div className="ma-status">
+                      {ma.above5 ? '▲ 站上' : '▼ 低於'}
+                    </div>
+                  </div>
+                  <div className={`ma-item ${ma.above20 ? 'above' : 'below'}`}>
+                    <div className="ma-name">MA20</div>
+                    <div className="ma-value">{formatPrice(ma.m20)}</div>
+                    <div className="ma-status">
+                      {ma.above20 ? '▲ 站上' : '▼ 低於'}
+                    </div>
+                  </div>
+                  <div className={`ma-item ${ma.above60 ? 'above' : 'below'}`}>
+                    <div className="ma-name">MA60</div>
+                    <div className="ma-value">{formatPrice(ma.m60)}</div>
+                    <div className="ma-status">
+                      {ma.above60 ? '▲ 站上' : '▼ 低於'}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="ma-arrangement">
+                  <span className="detail-label">排列型態</span>
+                  <span
+                    className={`ma-arr-badge ${
+                      ma.arrangement === '多頭排列'
+                        ? 'bull'
+                        : ma.arrangement === '空頭排列'
+                        ? 'bear'
+                        : 'side'
+                    }`}
+                  >
+                    {ma.arrangement}
+                  </span>
+                </div>
+
+                <div className="detail-row" style={{ marginTop: 10, marginBottom: 0 }}>
+                  <span className="detail-label">技術建議（依現價 vs 均線計算）</span>
+                  <span className="detail-value ma-advice">{ma.advice}</span>
+                </div>
+              </>
+            ) : (
+              <div className="detail-value muted">尚無均線資料</div>
+            )}
+          </div>
+
           {holding.note && (
-            <div className="detail-row">
+            <div className="detail-row" style={{ marginTop: 12 }}>
               <span className="detail-label">補充觀察</span>
               <span className="detail-value">{holding.note}</span>
             </div>
           )}
-          <p className="detail-value muted" style={{ marginTop: 8, fontSize: 11 }}>
-            均線以 Yahoo Finance 近約 4 個月日線收盤價計算（SMA）；▲ 現價≥均線、▼ 現價<均線。非投資建議。
+
+          <p className="detail-value muted" style={{ marginTop: 10, fontSize: 11 }}>
+            均線以近約 4 個月日線收盤價計算（SMA）；▲ 現價≥均線、▼ 現價&lt;均線。建議由程式依現價與均線動態計算，非投資建議。
           </p>
         </div>
       )}
