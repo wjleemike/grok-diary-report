@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { computeSignal, SIGNAL_RULE, SIGNAL_LABEL, BIAS_LABEL } from '../utils/signal.js';
 
 function formatNumber(num) {
   if (num === null || num === undefined) return '—';
@@ -8,12 +9,6 @@ function formatPrice(price) {
   if (price === null || price === undefined) return '—';
   return price % 1 === 0 ? price.toString() : Number(price).toFixed(2);
 }
-
-const SIGNAL_RULE = {
-  green: '未實現損益率 ≥ +15%：趨勢偏多，可持續持有或分批加碼觀察',
-  yellow: '未實現損益率介於 -5%～+15%：震盪整理，以觀望為主',
-  red: '未實現損益率 < -5%：壓力較大，建議檢視停損或減碼',
-};
 
 /**
  * 真實 MA 數值計算
@@ -53,7 +48,6 @@ function computeMaAnalysis(price, ma5, ma20, ma60) {
   const above20 = p >= m20;
   const above60 = p >= m60;
 
-  // 排列判斷（嚴格）
   let arrangement = '均線糾結／震盪';
   if (m5 > m20 && m20 > m60 && above5) {
     arrangement = '多頭排列';
@@ -61,7 +55,6 @@ function computeMaAnalysis(price, ma5, ma20, ma60) {
     arrangement = '空頭排列';
   }
 
-  // 站上／低於文字
   const aboveList = [];
   const belowList = [];
   if (above5) aboveList.push('MA5');
@@ -83,7 +76,6 @@ function computeMaAnalysis(price, ma5, ma20, ma60) {
       (belowList.length ? `低於 ${belowList.join(',')}` : '');
   }
 
-  // 建議邏輯（與先前手動撰寫的語意對齊，改為真實計算）
   let advice = `現價 ${formatPrice(p)}：${statusText}。`;
 
   if (above5 && above20 && above60) {
@@ -131,7 +123,9 @@ function computeMaAnalysis(price, ma5, ma20, ma60) {
 export default function HoldingItem({ holding }) {
   const [open, setOpen] = useState(false);
   const isPositive = holding.changePct >= 0;
-  const signalLabel = { green: '綠燈', yellow: '黃燈', red: '紅燈' }[holding.signal];
+  const judged = computeSignal(holding);
+  const signal = judged.signal;
+  const signalLabel = SIGNAL_LABEL[signal];
 
   const ma = computeMaAnalysis(
     holding.price,
@@ -143,7 +137,7 @@ export default function HoldingItem({ holding }) {
   return (
     <div
       className={`holding-item ${open ? 'expanded' : ''}`}
-      data-signal={holding.signal}
+      data-signal={signal}
       onClick={() => setOpen((v) => !v)}
       role="button"
       tabIndex={0}
@@ -156,7 +150,7 @@ export default function HoldingItem({ holding }) {
     >
       <div className="holding-main">
         <div className="holding-left">
-          <div className={`holding-bar ${holding.signal}`} />
+          <div className={`holding-bar ${signal}`} />
           <div className="holding-info">
             <div className="name">
               {holding.name} <span className="tag">{holding.tag}</span>
@@ -180,8 +174,8 @@ export default function HoldingItem({ holding }) {
               {formatNumber(holding.dailyPnl)}
             </div>
           </div>
-          <span className={`holding-badge ${holding.signal}`}>
-            <span className={`dot ${holding.signal}`} />
+          <span className={`holding-badge ${signal}`}>
+            <span className={`dot ${signal}`} />
             {signalLabel}
           </span>
           <span className={`arrow ${open ? 'open' : ''}`}>›</span>
@@ -191,34 +185,47 @@ export default function HoldingItem({ holding }) {
       {open && (
         <div className="holding-detail" onClick={(e) => e.stopPropagation()}>
           <div className="detail-row signal-reason">
-            <span className="detail-label">燈號說明</span>
+            <span className="detail-label">燈號說明（損益 × 均線）</span>
             <span className="detail-value">
-              <strong className={holding.signal}>{signalLabel}</strong>
+              <strong className={signal}>{signalLabel}</strong>
               {' — '}
-              {holding.reason || SIGNAL_RULE[holding.signal]}
+              {judged.reason}
             </span>
           </div>
 
           <div className="detail-grid">
             <div>
               <span className="detail-label">判定規則</span>
-              <span className="detail-value muted">{SIGNAL_RULE[holding.signal]}</span>
+              <span className="detail-value muted">{SIGNAL_RULE[signal]}</span>
+            </div>
+            <div>
+              <span className="detail-label">損益偏向</span>
+              <span className={`detail-value bias-${judged.pnlBias}`}>
+                {BIAS_LABEL[judged.pnlBias]}
+                {' '}
+                （{isPositive ? '+' : ''}{holding.changePct.toFixed(2)}%）
+              </span>
+            </div>
+            <div>
+              <span className="detail-label">均線偏向</span>
+              <span className={`detail-value bias-${judged.maBias}`}>
+                {BIAS_LABEL[judged.maBias]}
+                {judged.ma.hasData
+                  ? judged.ma.above20
+                    ? '（站上 MA20）'
+                    : judged.ma.above60
+                      ? '（低於 MA20、站上 MA60）'
+                      : '（低於 MA20／MA60）'
+                  : ''}
+              </span>
             </div>
             <div>
               <span className="detail-label">產業／類型</span>
               <span className="detail-value">{holding.sector || holding.tag}</span>
             </div>
             <div>
-              <span className="detail-label">持有股數</span>
-              <span className="detail-value">{formatNumber(holding.shares)}</span>
-            </div>
-            <div>
               <span className="detail-label">現價</span>
               <span className="detail-value">{formatPrice(holding.price)}</span>
-            </div>
-            <div>
-              <span className="detail-label">市值</span>
-              <span className="detail-value">{formatNumber(holding.marketValue)}</span>
             </div>
             <div>
               <span className="detail-label">未實現損益</span>
@@ -230,7 +237,6 @@ export default function HoldingItem({ holding }) {
             </div>
           </div>
 
-          {/* ===== 真實 MA 計算區塊 ===== */}
           <div className="ma-section">
             <div className="detail-label" style={{ marginBottom: 8 }}>
               均線分析（真實計算）
@@ -295,7 +301,7 @@ export default function HoldingItem({ holding }) {
           )}
 
           <p className="detail-value muted" style={{ marginTop: 10, fontSize: 11 }}>
-            均線以近約 4 個月日線收盤價計算（SMA）；▲ 現價≥均線、▼ 現價&lt;均線。建議由程式依現價與均線動態計算，非投資建議。
+            燈號採雙重確認：綠燈需「未實現 ≥ +15%」且「現價 ≥ MA20」；紅燈需「未實現 < -5%」且「現價低於 MA20 與 MA60」。均線為近約 4 個月日線 SMA。非投資建議。
           </p>
         </div>
       )}
