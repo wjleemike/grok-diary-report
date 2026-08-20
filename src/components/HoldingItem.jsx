@@ -9,6 +9,35 @@ function formatPrice(price) {
   if (price === null || price === undefined) return '—';
   return price % 1 === 0 ? price.toString() : Number(price).toFixed(2);
 }
+function lotStr(shares) {
+  if (shares == null || Number.isNaN(Number(shares))) return '—';
+  const lots = Number(shares) / 1000;
+  const abs = Math.abs(lots);
+  const body = abs >= 100 ? abs.toFixed(0) : abs.toFixed(1);
+  if (lots > 0) return '+' + Number(body).toLocaleString('en-US');
+  if (lots < 0) return '-' + Number(body).toLocaleString('en-US');
+  return '0';
+}
+
+function lotClass(shares) {
+  const n = Number(shares);
+  if (!n) return '';
+  return n > 0 ? 'up' : 'down';
+}
+
+function instSummary(rows) {
+  if (!rows || !rows.length) return null;
+  return rows.reduce(
+    (a, r) => ({
+      foreign: a.foreign + (r.foreign || 0),
+      trust: a.trust + (r.trust || 0),
+      dealer: a.dealer + (r.dealer || 0),
+      total: a.total + (r.total || 0),
+    }),
+    { foreign: 0, trust: 0, dealer: 0, total: 0 }
+  );
+}
+
 
 /**
  * 真實 MA 數值計算
@@ -201,6 +230,68 @@ export default function HoldingItem({ holding }) {
               </li>
             ))}
           </ul>
+
+          <div className="inst-section">
+            <div className="detail-label" style={{ marginBottom: 8 }}>
+              三大法人近期買賣超（近 { (holding.institutions || []).length || 0 } 日，單位：張）
+            </div>
+            {!(holding.institutions && holding.institutions.length) ? (
+              <div className="detail-value muted">無三大法人資料（無對應上市櫃代號）</div>
+            ) : (
+              <>
+                {(() => {
+                  const s = instSummary(holding.institutions);
+                  return (
+                    <div className="inst-sum">
+                      <div>
+                        <span className="detail-label">外資 5 日合計</span>
+                        <span className={`detail-value ${lotClass(s.foreign)}`}>{lotStr(s.foreign)}</span>
+                      </div>
+                      <div>
+                        <span className="detail-label">投信 5 日合計</span>
+                        <span className={`detail-value ${lotClass(s.trust)}`}>{lotStr(s.trust)}</span>
+                      </div>
+                      <div>
+                        <span className="detail-label">自營商 5 日合計</span>
+                        <span className={`detail-value ${lotClass(s.dealer)}`}>{lotStr(s.dealer)}</span>
+                      </div>
+                      <div>
+                        <span className="detail-label">三大法人合計</span>
+                        <span className={`detail-value ${lotClass(s.total)}`}>{lotStr(s.total)}</span>
+                      </div>
+                    </div>
+                  );
+                })()}
+                <div className="mr-table-wrap">
+                  <table className="mr-table inst-table">
+                    <thead>
+                      <tr>
+                        <th style={{ textAlign: 'left' }}>日期</th>
+                        <th>外資</th>
+                        <th>投信</th>
+                        <th>自營商</th>
+                        <th>合計</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {holding.institutions.map((r) => (
+                        <tr key={r.date}>
+                          <td style={{ textAlign: 'left' }}>{r.date}</td>
+                          <td className={lotClass(r.foreign)}>{lotStr(r.foreign)}</td>
+                          <td className={lotClass(r.trust)}>{lotStr(r.trust)}</td>
+                          <td className={lotClass(r.dealer)}>{lotStr(r.dealer)}</td>
+                          <td className={lotClass(r.total)}>{lotStr(r.total)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="detail-value muted" style={{ fontSize: 11, marginTop: 4 }}>
+                  正數＝買超、負數＝賣超（紅漲綠跌）。資料來源：證交所 T86／櫃買三大法人，8/13–8/19。
+                </p>
+              </>
+            )}
+          </div>
 
           <div className="detail-grid">
             <div>
