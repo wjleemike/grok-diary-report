@@ -1,36 +1,36 @@
 const rows = [
-  { name:'大華優利高填息', tag:'ETF', sector:'高息／科技 ETF', shares:5480, avg:20.69, price:33.77, chg:-0.94, mv:185060, pnl:71678, pct:63.22, div:'—' },
-  { name:'復華台灣科技優息', tag:'ETF', sector:'高息／科技 ETF', shares:5700, avg:18.40, price:28.89, chg:-1.06, mv:164673, pnl:59793, pct:57.01, div:'2,156' },
-  { name:'群益ESG投等債20+', tag:'ETF', sector:'債券 ETF', shares:6810, avg:14.75, price:14.18, chg:-1.60, mv:96566, pnl:-3882, pct:-3.86, div:'—' },
-  { name:'統一台灣高息動能', tag:'ETF', sector:'高息／科技 ETF', shares:3000, avg:14.31, price:22.31, chg:-0.09, mv:66930, pnl:24000, pct:55.90, div:'—' },
-  { name:'中信關鍵半導體', tag:'ETF', sector:'半導體 ETF', shares:1000, avg:15.97, price:33.83, chg:-6.62, mv:33830, pnl:17860, pct:111.83, div:'—' },
-  { name:'群益台灣精選高息', tag:'ETF', sector:'高息／科技 ETF', shares:1000, avg:21.19, price:30.35, chg:-0.03, mv:30350, pnl:9160, pct:43.23, div:'—' },
-  { name:'中信中國高股息', tag:'ETF', sector:'高息／科技 ETF', shares:2020, avg:12.68, price:14.88, chg:-0.73, mv:30058, pnl:4444, pct:17.35, div:'1,101' },
-  { name:'元大台灣價值高息', tag:'ETF', sector:'高息／科技 ETF', shares:2300, avg:9.63, price:12.34, chg:-0.96, mv:28382, pnl:6233, pct:28.14, div:'—' },
-  { name:'主動野村台灣優選', tag:'ETF', sector:'高息／科技 ETF', shares:1150, avg:19.01, price:24.52, chg:-4.29, mv:28198, pnl:6337, pct:28.98, div:'—' },
-  { name:'台積電', tag:'個股', sector:'半導體', shares:30, avg:1525.43, price:2350.00, chg:-1.26, mv:70500, pnl:24737, pct:54.05, div:'—' },
-  { name:'智原', tag:'個股', sector:'半導體', shares:450, avg:162.05, price:172.00, chg:-2.82, mv:77400, pnl:4478, pct:6.14, div:'—' },
-  { name:'材料-KY', tag:'個股', sector:'半導體', shares:3050, avg:50.11, price:50.40, chg:0.60, mv:153720, pnl:1190, pct:0.78, div:'—' },
-  { name:'原相', tag:'個股', sector:'半導體', shares:125, avg:203.44, price:197.00, chg:-0.76, mv:24625, pnl:-805, pct:-3.17, div:'—' },
-  { name:'奕力-KY', tag:'個股', sector:'半導體', shares:1650, avg:55.60, price:30.30, chg:-2.10, mv:49995, pnl:-41745, pct:-45.50, div:'—' },
-  { name:'廣達', tag:'個股', sector:'電子製造／ODM', shares:315, avg:260.02, price:325.00, chg:-2.55, mv:102375, pnl:20469, pct:24.99, div:'—' },
-  { name:'技嘉', tag:'個股', sector:'電子製造／ODM', shares:420, avg:275.88, price:347.50, chg:-2.93, mv:145950, pnl:30080, pct:25.96, div:'—' },
-  { name:'英業達', tag:'個股', sector:'電子製造／ODM', shares:220, avg:58.45, price:64.60, chg:-3.15, mv:14212, pnl:1353, pct:10.52, div:'590' },
-  { name:'技宸', tag:'個股', sector:'電子製造／ODM', shares:12, avg:255.00, price:220.00, chg:0.00, mv:2640, pnl:-420, pct:-13.73, div:'—' },
-  { name:'中信金', tag:'個股', sector:'金融', shares:1000, avg:37.72, price:66.40, chg:1.22, mv:66400, pnl:28680, pct:76.03, div:'2,490' },
-  { name:'玉山金', tag:'個股', sector:'金融', shares:1960, avg:28.04, price:38.25, chg:1.32, mv:74970, pnl:20012, pct:36.41, div:'—' },
-  { name:'凱基金', tag:'個股', sector:'金融', shares:2421, avg:16.05, price:30.95, chg:-1.43, mv:74930, pnl:36073, pct:92.83, div:'—' },
-  { name:'國票金', tag:'個股', sector:'金融', shares:1027, avg:12.97, price:15.60, chg:-0.32, mv:16021, pnl:2701, pct:20.28, div:'—' },
-  { name:'遠東銀', tag:'個股', sector:'金融', shares:2453, avg:13.69, price:13.45, chg:-1.10, mv:32993, pnl:-589, pct:-1.75, div:'—' },
-  { name:'福邦證', tag:'個股', sector:'金融', shares:1750, avg:14.32, price:14.50, chg:-0.34, mv:25375, pnl:315, pct:1.26, div:'—' },
-  { name:'群益證', tag:'個股', sector:'金融', shares:1300, avg:20.64, price:30.60, chg:0.16, mv:39780, pnl:12948, pct:48.26, div:'—' },
+  { name:'大華優利高填息', tag:'ETF', sector:'高息／科技 ETF', shares:5480, avg:20.69, price:33.64, chg:-0.44, mv:184347, pnl:70966, pct:62.59, div:'—' },
+  { name:'復華台灣科技優息', tag:'ETF', sector:'高息／科技 ETF', shares:5700, avg:18.40, price:28.44, chg:-1.49, mv:162108, pnl:57228, pct:54.57, div:'2,156' },
+  { name:'群益ESG投等債20+', tag:'ETF', sector:'債券 ETF', shares:6810, avg:14.75, price:14.42, chg:1.26, mv:98200, pnl:-2247, pct:-2.24, div:'—' },
+  { name:'統一台灣高息動能', tag:'ETF', sector:'高息／科技 ETF', shares:3000, avg:14.31, price:22.21, chg:-0.49, mv:66630, pnl:23700, pct:55.21, div:'—' },
+  { name:'中信關鍵半導體', tag:'ETF', sector:'半導體 ETF', shares:1000, avg:15.97, price:39.05, chg:-1.14, mv:39050, pnl:23080, pct:144.52, div:'—' },
+  { name:'群益台灣精選高息', tag:'ETF', sector:'高息／科技 ETF', shares:1000, avg:21.19, price:30.31, chg:-0.1, mv:30310, pnl:9120, pct:43.04, div:'—' },
+  { name:'中信中國高股息', tag:'ETF', sector:'高息／科技 ETF', shares:2020, avg:12.68, price:15.07, chg:1.21, mv:30441, pnl:4828, pct:18.85, div:'1,101' },
+  { name:'元大台灣價值高息', tag:'ETF', sector:'高息／科技 ETF', shares:2300, avg:9.63, price:12.40, chg:0.4, mv:28520, pnl:6371, pct:28.76, div:'—' },
+  { name:'主動野村台灣優選', tag:'ETF', sector:'高息／科技 ETF', shares:1150, avg:19.01, price:28.36, chg:-0.32, mv:32614, pnl:10752, pct:49.18, div:'—' },
+  { name:'台積電', tag:'個股', sector:'半導體', shares:30, avg:1525.43, price:2375.00, chg:1.06, mv:71250, pnl:25487, pct:55.69, div:'—' },
+  { name:'智原', tag:'個股', sector:'半導體', shares:450, avg:162.05, price:172.00, chg:-0.29, mv:77400, pnl:4477, pct:6.14, div:'—' },
+  { name:'材料-KY', tag:'個股', sector:'半導體', shares:3050, avg:50.11, price:50.20, chg:-0.99, mv:153110, pnl:275, pct:0.18, div:'—' },
+  { name:'原相', tag:'個股', sector:'半導體', shares:125, avg:203.44, price:200.00, chg:1.01, mv:25000, pnl:-430, pct:-1.69, div:'—' },
+  { name:'奕力-KY', tag:'個股', sector:'半導體', shares:1650, avg:55.60, price:31.00, chg:1.14, mv:51150, pnl:-40590, pct:-44.24, div:'—' },
+  { name:'廣達', tag:'個股', sector:'電子製造／ODM', shares:315, avg:260.02, price:327.00, chg:-1.21, mv:103005, pnl:21099, pct:25.76, div:'—' },
+  { name:'技嘉', tag:'個股', sector:'電子製造／ODM', shares:420, avg:275.88, price:344.00, chg:-1.29, mv:144480, pnl:28610, pct:24.69, div:'—' },
+  { name:'英業達', tag:'個股', sector:'電子製造／ODM', shares:220, avg:58.45, price:64.50, chg:-1.07, mv:14190, pnl:1331, pct:10.35, div:'590' },
+  { name:'技宸', tag:'個股', sector:'電子製造／ODM', shares:12, avg:255.00, price:223.50, chg:0.0, mv:2682, pnl:-378, pct:-12.35, div:'—' },
+  { name:'中信金', tag:'個股', sector:'金融', shares:1000, avg:37.72, price:63.40, chg:-2.31, mv:63400, pnl:25680, pct:68.08, div:'2,490' },
+  { name:'玉山金', tag:'個股', sector:'金融', shares:1960, avg:28.04, price:37.35, chg:-1.19, mv:73206, pnl:18248, pct:33.2, div:'—' },
+  { name:'凱基金', tag:'個股', sector:'金融', shares:2421, avg:16.05, price:30.40, chg:0.0, mv:73598, pnl:34741, pct:89.41, div:'—' },
+  { name:'國票金', tag:'個股', sector:'金融', shares:1027, avg:12.97, price:15.65, chg:0.64, mv:16073, pnl:2752, pct:20.66, div:'—' },
+  { name:'遠東銀', tag:'個股', sector:'金融', shares:2453, avg:13.69, price:13.60, chg:0.74, mv:33361, pnl:-221, pct:-0.66, div:'—' },
+  { name:'福邦證', tag:'個股', sector:'金融', shares:1750, avg:14.32, price:14.65, chg:1.03, mv:25638, pnl:578, pct:2.3, div:'—' },
+  { name:'群益證', tag:'個股', sector:'金融', shares:1300, avg:20.64, price:30.35, chg:0.5, mv:39455, pnl:12623, pct:47.04, div:'—' },
   { name:'華票', tag:'個股', sector:'金融', shares:1000, avg:14.62, price:16.30, chg:0.31, mv:16300, pnl:1680, pct:11.49, div:'—' },
-  { name:'三商壽', tag:'個股', sector:'金融', shares:4310, avg:6.60, price:9.82, chg:1.13, mv:42324, pnl:13878, pct:48.79, div:'—' },
-  { name:'長榮', tag:'個股', sector:'航運', shares:230, avg:230.72, price:238.50, chg:3.02, mv:54855, pnl:1789, pct:3.37, div:'—' },
-  { name:'潤隆', tag:'個股', sector:'營建', shares:1000, avg:31.68, price:33.00, chg:0.00, mv:33000, pnl:1320, pct:4.17, div:'—' },
-  { name:'海悅', tag:'個股', sector:'營建', shares:1000, avg:80.79, price:69.60, chg:-1.14, mv:69600, pnl:-11190, pct:-13.85, div:'—' },
-  { name:'中鴻', tag:'個股', sector:'鋼鐵', shares:1000, avg:26.15, price:17.00, chg:-0.58, mv:17000, pnl:-9150, pct:-34.99, div:'—' },
-  { name:'王品', tag:'個股', sector:'餐飲', shares:70, avg:225.09, price:232.00, chg:-0.22, mv:16240, pnl:484, pct:3.07, div:'—' },
+  { name:'三商壽', tag:'個股', sector:'金融', shares:4310, avg:6.60, price:9.75, chg:0.0, mv:42022, pnl:13577, pct:47.73, div:'—' },
+  { name:'長榮', tag:'個股', sector:'航運', shares:230, avg:230.72, price:246.00, chg:2.29, mv:56580, pnl:3514, pct:6.62, div:'—' },
+  { name:'潤隆', tag:'個股', sector:'營建', shares:1000, avg:31.68, price:34.50, chg:3.6, mv:34500, pnl:2820, pct:8.9, div:'—' },
+  { name:'海悅', tag:'個股', sector:'營建', shares:1000, avg:80.79, price:71.80, chg:2.57, mv:71800, pnl:-8990, pct:-11.13, div:'—' },
+  { name:'中鴻', tag:'個股', sector:'鋼鐵', shares:1000, avg:26.15, price:17.35, chg:2.66, mv:17350, pnl:-8800, pct:-33.65, div:'—' },
+  { name:'王品', tag:'個股', sector:'餐飲', shares:70, avg:225.09, price:237.00, chg:1.28, mv:16590, pnl:834, pct:5.29, div:'—' },
 ];
 
 function fmt(n, digits = 0) {
@@ -101,22 +101,22 @@ export default function PortfolioPnL() {
     <div className="market-report">
       <p className="section-label">PORTFOLIO P&L</p>
       <h1 className="main-title">持股損益總表</h1>
-      <p className="subtitle">計算日期 2026/08/19（台積電已用當日收盤；其餘多數仍為前次基準）・依 ETF 與個股類股分類</p>
-      <p className="update-time" style={{ marginTop: -8, marginBottom: 16 }}>現價與損益計算基準：2026年8月19日</p>
+      <p className="subtitle">計算日期 2026/08/20 收盤・32 檔持股依 Yahoo／證交所／櫃買收盤重算</p>
+      <p className="update-time" style={{ marginTop: -8, marginBottom: 16 }}>現價與損益計算基準：2026年8月20日</p>
 
       <div className="summary-row" style={{ gridTemplateColumns: 'repeat(3,1fr)', marginBottom: 20 }}>
         <div className="summary-card">
           <div className="label">總投入成本</div>
-          <div className="value">1,551,341</div>
+          <div className="value">1,551,645</div>
         </div>
         <div className="summary-card">
           <div className="label">總市值</div>
-          <div className="value">1,886,151</div>
+          <div className="value">1,894,360</div>
         </div>
         <div className="summary-card">
           <div className="label">總未實現損益</div>
-          <div className="value" style={{ color: 'var(--reds)' }}>+334,810</div>
-          <div className="label" style={{ marginTop: 4 }}>(+21.58%)</div>
+          <div className="value" style={{ color: 'var(--reds)' }}>+342,715</div>
+          <div className="label" style={{ marginTop: 4 }}>(+22.09%)</div>
         </div>
       </div>
 
@@ -159,7 +159,7 @@ export default function PortfolioPnL() {
       </section>
 
       <p className="mr-note" style={{ marginTop: 12 }}>
-        未實現損益 = 市值 − 持有股數 × 買入均價（不含手續費／交易稅）。總市值數字尚未依全部個股今日收盤重算，僅台積電已更新。
+        未實現損益 = 市值 − 持有股數 × 買入均價（不含手續費／交易稅）。現價為 2026/08/20 收盤（三商壽、技宸當日無成交，沿用前一交易日）。
       </p>
     </div>
   );
