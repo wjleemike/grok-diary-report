@@ -41,48 +41,62 @@ const FOX = [
   { date: '2026/08/19', tone: 'neutral', title: 'Lakers 股權爭奪：Jeanie Buss 與手足對峙', en: 'Jeanie Buss battling siblings over sale of remaining Lakers shares', href: 'https://www.foxbusiness.com/sports/jeanie-buss-battling-siblings-over-sale-remaining-lakers-shares-new-ownership-group-reports', tag: '企業' },
 ];
 
-export default function GlobalNews() {
+export default function GlobalNews({ news, usMarkets, reportDate, live }) {
+  const cnn = news?.cnn?.length ? news.cnn : CNN;
+  const bbg = news?.bloomberg?.length ? news.bloomberg : BLOOMBERG;
+  const fox = news?.fox?.length ? news.fox : FOX;
+  const liveUs = usMarkets?.length ? usMarkets : null;
+
   return (
     <div className="market-report">
       <h1 className="main-title">國際財經頭條</h1>
-      <p className="subtitle">資料日期 2026/08/19～20・紅＝好消息、綠＝壞消息・點擊開原文</p>
+      <p className="subtitle">
+        {live ? `即時更新 ${reportDate || ''}`.trim() : '資料日期 2026/08/19～20'}
+        ・紅＝好消息、綠＝壞消息・點擊開原文
+        {live ? ' ・ 來源：Google News／各大媒體 RSS' : ''}
+      </p>
 
       <section className="mr-section">
         <h2 className="mr-section-title">1. 全球財經頭條（三大媒體精選）</h2>
         <p className="mr-note" style={{ marginBottom: 12 }}>
-          點擊卡片開啟原文。中文下方為英文標題。已全部改為可直接開啟的文章連結。
+          點擊卡片開啟原文。{live ? '標題來自即時新聞源。' : '中文下方為英文標題。'}可用右上角「立即更新」重抓。
         </p>
 
         <h3 className="mr-sub">CNN Business</h3>
-        <NewsList items={CNN} />
+        <NewsList items={cnn} />
 
         <h3 className="mr-sub">Bloomberg</h3>
-        <NewsList items={BLOOMBERG} />
+        <NewsList items={bbg} />
 
         <h3 className="mr-sub">Fox Business</h3>
-        <NewsList items={FOX} />
+        <NewsList items={fox} />
       </section>
 
       <section className="mr-section">
-        <h2 className="mr-section-title">2. 昨日美股收盤解析（2026/08/19）</h2>
-        <div className="us-markets mr-global" style={{ marginBottom: 16 }}>
-          <div className="us-card"><div className="label">道瓊 Dow</div><div className="value change up">53,463.05</div><div className="change up">+119.65 (+0.22%)</div></div>
-          <div className="us-card"><div className="label">S&P 500</div><div className="value change up">7,707.98</div><div className="change up">+16.22 (+0.21%)</div></div>
-          <div className="us-card"><div className="label">Nasdaq</div><div className="value change up">26,331.09</div><div className="change up">+41.38 (+0.16%)</div></div>
-          <div className="us-card"><div className="label">費半 SOX</div><div className="value change down">11,738.23</div><div className="change down">-2.12%</div></div>
-        </div>
+        <h2 className="mr-section-title">2. 美股指數（最新）</h2>
+        {liveUs ? (
+          <div className="us-markets mr-global" style={{ marginBottom: 16 }}>
+            {liveUs.map((x) => (
+              <div className="us-card" key={x.id}>
+                <div className="label">{x.label}</div>
+                <div className={`value change ${x.direction}`}>{x.value}</div>
+                <div className={`change ${x.direction}`}>{x.change}</div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="us-markets mr-global" style={{ marginBottom: 16 }}>
+            <div className="us-card"><div className="label">道瓊 Dow</div><div className="value change up">53,463.05</div><div className="change up">+119.65 (+0.22%)</div></div>
+            <div className="us-card"><div className="label">S&P 500</div><div className="value change up">7,707.98</div><div className="change up">+16.22 (+0.21%)</div></div>
+            <div className="us-card"><div className="label">Nasdaq</div><div className="value change up">26,331.09</div><div className="change up">+41.38 (+0.16%)</div></div>
+            <div className="us-card"><div className="label">費半 SOX</div><div className="value change down">11,738.23</div><div className="change down">-2.12%</div></div>
+          </div>
+        )}
         <p className="mr-note" style={{ marginBottom: 12 }}>
-          <strong>收盤概況：</strong>三大指數結束連三黑小幅收紅；費半續跌 2.12% 至 11,738.23。30 年美債殖利率回落約 10 個基點。健康護理領漲（Moderna 暴漲），半導體與部分 AI 基礎設施股仍偏弱。美東 8/20 尚未開盤。
+          <strong>說明：</strong>指數為 Yahoo Finance 最新報價（美股時段為盤中／收盤）。點「立即更新」同步最新點位。以下盤勢解析仍為 8/19–8/20 人工整理，供背景參考。
         </p>
         <p className="mr-note" style={{ marginBottom: 12 }}>
-          <strong>主要驅動因素：</strong><br />
-          1. <strong>財政部加大長債回購</strong>：宣布加倍回購較長天期公債，緩和殖利率急升壓力，支撐風險資產。<br />
-          2. <strong>Moderna／Merck 癌症疫苗</strong>：個人化 mRNA 黑色素瘤疫苗三期試驗達標，帶動醫療板塊大漲。<br />
-          3. <strong>韓系記憶體股東回饋</strong>：SK 海力士宣布約 290 億美元庫藏；8/20 亞盤三星傳 720 億美元股東回饋，KOSPI 大漲 5.89%。<br />
-          4. <strong>其他</strong>：美國國債突破 40 兆美元；川普延後加拿大 50% 關稅；油價因荷莫茲／伊朗情勢仍高。
-        </p>
-        <p className="mr-note">
-          <strong>亞盤 8/20 跟進：</strong>日經 66,216.79（+1.36%）、KOSPI 6,852.58（+5.89%，三星／SK 海力士急拉）。台股終場收漲 214 點，記憶體與 CPO 族群強勢，電腦週邊與金融偏弱。
+          <strong>8/19 收盤概況（參考）：</strong>三大指數結束連三黑小幅收紅；費半續跌。財政部加大長債回購、Moderna／Merck 癌症疫苗、韓系記憶體股東回饋為主要驅動。
         </p>
       </section>
 
@@ -90,13 +104,10 @@ export default function GlobalNews() {
         <h2 className="mr-section-title">3. 對台北股市的影響評估</h2>
         <p className="mr-note" style={{ marginBottom: 12 }}>
           <strong>產業連動路徑：</strong><br />
-          • <strong>半導體／AI</strong>：費半 8/19 仍跌 2.12%，但 8/20 韓股記憶體大漲、三星／SK 海力士股東回饋題材發酵 → 台股記憶體與 CPO 強勢，台積電收 2,375（+1.06%）止跌。<br />
-          • <strong>科技／ODM</strong>：電腦週邊類指跌 1.67% → 廣達、技嘉、英業達短線仍受壓抑。<br />
-          • <strong>金融</strong>：金融保險類指跌 0.66%；中信金、玉山金走弱，利率敏感股未同步受惠殖利率回落。<br />
-          • <strong>航運／傳產</strong>：航運類指 +2.48%，長榮收 246（+2.29%）；油電燃氣、水泥、紡織領漲。
-        </p>
-        <p className="mr-note" style={{ marginBottom: 12 }}>
-          <strong>台股 8/20 實際走勢：</strong>早盤一度漲逾 440 點站上 45,000，盤中震盪逾 700 點；終場收 44,933.74（+214.39、+0.48%），成交約 7,930 億。櫃買 389.96（+1.34%）。上市法人合計賣超 35.4 億（外資轉買、投信／自營續賣）。
+          • <strong>半導體／AI</strong>：費半與台積電 ADR 連動高；韓系記憶體股東回饋題材影響亞洲半導體情緒。<br />
+          • <strong>科技／ODM</strong>：廣達、技嘉、英業達短線受美科技股與 AI 資本支出預期牽動。<br />
+          • <strong>金融</strong>：利率與風險偏好變化影響金控股。<br />
+          • <strong>航運／傳產</strong>：油價、全球貿易與風險情緒。
         </p>
         <h3 className="mr-sub">受美股影響較大的相關持股</h3>
         <div className="mr-table-wrap">

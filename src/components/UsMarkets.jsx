@@ -1,8 +1,10 @@
-import { usMarkets } from '../data/mockData';
-export default function UsMarkets() {
+import { usMarkets as seed } from '../data/mockData';
+
+export default function UsMarkets({ items }) {
+  const list = items?.length ? items : seed;
   return (
     <div className="us-markets">
-      {usMarkets.map((item) => (
+      {list.map((item) => (
         <div key={item.id} className="us-card">
           <div className="label">{item.label}</div>
           <div className={`value change ${item.direction}`}>{item.value}</div>

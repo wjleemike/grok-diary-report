@@ -91,32 +91,54 @@ function RowTable({ list }) {
 const ETF_ORDER = ['半導體 ETF', '高息／科技 ETF', '債券 ETF'];
 const STOCK_ORDER = ['半導體', '電子製造／ODM', '金融', '航運', '營建', '鋼鐵', '餐飲'];
 
-export default function PortfolioPnL() {
-  const etfs = rows.filter((r) => r.tag === 'ETF');
-  const stocks = rows.filter((r) => r.tag === '個股');
+function mergeLive(base, holdings) {
+  if (!holdings?.length) return base;
+  const byName = Object.fromEntries(holdings.map((h) => [h.name, h]));
+  return base.map((r) => {
+    const h = byName[r.name];
+    if (!h || h.price == null) return r;
+    const price = Number(h.price);
+    const mv = Math.round(price * r.shares);
+    const pnl = Math.round((price - r.avg) * r.shares);
+    const pct = r.avg ? ((price / r.avg) - 1) * 100 : r.pct;
+    const chg = h.dayChangePct != null ? Number(h.dayChangePct) : r.chg;
+    return { ...r, price, mv, pnl, pct, chg };
+  });
+}
+
+export default function PortfolioPnL({ holdings, reportDate }) {
+  const liveRows = mergeLive(rows, holdings);
+  const etfs = liveRows.filter((r) => r.tag === 'ETF');
+  const stocks = liveRows.filter((r) => r.tag === '個股');
   const etfSum = sumGroup(etfs);
   const stockSum = sumGroup(stocks);
+  const allSum = sumGroup(liveRows);
+  const cost = liveRows.reduce((s, r) => s + r.shares * r.avg, 0);
+  const pct = cost ? (allSum.pnl / cost) * 100 : 0;
+  const dateLabel = reportDate ? reportDate.replace(/-/g, '/') : '2026/08/20';
 
   return (
     <div className="market-report">
       <p className="section-label">PORTFOLIO P&L</p>
       <h1 className="main-title">持股損益總表</h1>
-      <p className="subtitle">計算日期 2026/08/20 收盤・32 檔持股依 Yahoo／證交所／櫃買收盤重算</p>
-      <p className="update-time" style={{ marginTop: -8, marginBottom: 16 }}>現價與損益計算基準：2026年8月20日</p>
+      <p className="subtitle">計算日期 {dateLabel}・32 檔持股依 Yahoo／證交所／櫃買行情重算</p>
+      <p className="update-time" style={{ marginTop: -8, marginBottom: 16 }}>現價與損益計算基準：{dateLabel}（點「立即更新」同步最新現價）</p>
 
       <div className="summary-row" style={{ gridTemplateColumns: 'repeat(3,1fr)', marginBottom: 20 }}>
         <div className="summary-card">
           <div className="label">總投入成本</div>
-          <div className="value">1,551,645</div>
+          <div className="value">{fmt(Math.round(cost))}</div>
         </div>
         <div className="summary-card">
           <div className="label">總市值</div>
-          <div className="value">1,894,360</div>
+          <div className="value">{fmt(allSum.mv)}</div>
         </div>
         <div className="summary-card">
           <div className="label">總未實現損益</div>
-          <div className="value" style={{ color: 'var(--reds)' }}>+342,715</div>
-          <div className="label" style={{ marginTop: 4 }}>(+22.09%)</div>
+          <div className="value" style={{ color: allSum.pnl >= 0 ? 'var(--reds)' : 'var(--green)' }}>
+            {allSum.pnl >= 0 ? '+' : ''}{fmt(allSum.pnl)}
+          </div>
+          <div className="label" style={{ marginTop: 4 }}>({pct >= 0 ? '+' : ''}{pct.toFixed(2)}%)</div>
         </div>
       </div>
 
@@ -159,8 +181,9 @@ export default function PortfolioPnL() {
       </section>
 
       <p className="mr-note" style={{ marginTop: 12 }}>
-        未實現損益 = 市值 − 持有股數 × 買入均價（不含手續費／交易稅）。現價為 2026/08/20 收盤（三商壽、技宸當日無成交，沿用前一交易日）。
+        未實現損益 = 市值 − 持有股數 × 買入均價（不含手續費／交易稅）。現價來自「立即更新」抓取的 Yahoo／證交所最新行情；無成交則沿用前一交易日。
       </p>
     </div>
   );
 }
+

@@ -27,39 +27,50 @@ const aiNews = [
 ];
 
 
-export default function TaiwanAINews() {
+export default function TaiwanAINews({ news, reportDate, live }) {
+  const tw = news?.tw?.length ? news.tw : twNews;
+  const ai = news?.ai?.length ? news.ai : aiNews;
+
   return (
     <div className="market-report">
       <h1 className="main-title">台股/AI焦點新聞</h1>
-      <p className="subtitle">紅＝好消息、綠＝壞消息・資料日 2026/08/20・點擊卡片開原文</p>
+      <p className="subtitle">
+        紅＝好消息、綠＝壞消息・
+        {live ? `即時更新 ${reportDate || ''}` : '資料日 2026/08/20'}
+        ・點擊卡片開原文
+      </p>
 
       <section className="mr-section">
         <h2 className="mr-section-title">影響台股新聞</h2>
-        <p className="mr-note" style={{ marginBottom: 10 }}>彙整時間：2026/08/20 收盤 ・ 今日核心：台股震盪收漲 214 點、台積電 2,375；記憶體／CPO 強、電腦週邊與金融弱；韓股股東回饋帶動亞洲半導體情緒。</p>
-        <NewsList items={twNews} />
+        <p className="mr-note" style={{ marginBottom: 10 }}>
+          {live
+            ? '來源：Google 新聞「台股」即時 RSS。可用右上角「立即更新」重抓。'
+            : '彙整時間：2026/08/20 收盤 ・ 今日核心：台股震盪收漲 214 點、台積電 2,375；記憶體／CPO 強、電腦週邊與金融弱；韓股股東回饋帶動亞洲半導體情緒。'}
+        </p>
+        <NewsList items={tw} />
       </section>
 
       <section className="mr-section">
         <h2 className="mr-section-title">AI 最新進展</h2>
-        <p className="mr-note" style={{ marginBottom: 10 }}>長線算力與產品仍在推進；短線因三星／SK 海力士大額股東回饋，亞洲記憶體與半導體評價壓力明顯緩解。</p>
-        <NewsList items={aiNews} />
+        <p className="mr-note" style={{ marginBottom: 10 }}>
+          {live
+            ? '來源：Google 新聞 AI／Nvidia／OpenAI 即時 RSS。'
+            : '長線算力與產品仍在推進；短線因三星／SK 海力士大額股東回饋，亞洲記憶體與半導體評價壓力明顯緩解。'}
+        </p>
+        <NewsList items={ai} />
       </section>
 
       <section className="mr-section">
         <h2 className="mr-section-title">對我的持股影響分析</h2>
         <div style={{ background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 12, padding: '16px 18px' }}>
           <p className="mr-note" style={{ margin: 0, lineHeight: 1.8, fontSize: 15, color: 'var(--text)' }}>
-            <strong>今日一句話：</strong>台股 8/20 高低震盪逾 700 點後收漲 214.39 點至 44,933.74（+0.48%），台積電 2,375（+1.06%）止跌；韓系記憶體股東回饋帶動 CPO／記憶體強勢，但電腦週邊與金融仍弱。<br /><br />
-            <strong>台股盤勢（8/20）：</strong>加權 44,933.74（+0.48%）、櫃買 389.96（+1.34%）、成交約 7,930 億；股票上漲 778／下跌 228／平盤 59。上市法人合計賣超 35.4 億（外資 +37.8 億、投信 −12.1 億、自營偏賣）。<br /><br />
-            <strong>對你持股的意涵：</strong><br />
-            • <strong>台積電</strong>：收 2,375（+25、+1.06%），站回 MA20（2,358）但距 MA60（2,380）仍近，四項條件未同步，維持觀望／續抱而非追高。<br />
-            • <strong>廣達、技嘉、英業達</strong>：電腦週邊類指跌 1.67%，技嘉／英業達四項偏空較多，短線仍弱於記憶體／CPO。<br />
-            • <strong>智原、材料-KY、中信關鍵半導體</strong>：費半續弱、個股量能不足，智原與中信關鍵半導體燈號偏空；材料-KY 相對抗跌。<br />
-            • <strong>金融股</strong>（中信金、玉山金、凱基金）：金融保險類指 −0.66%，中信金放量下跌，短線動能偏空。<br />
-            • <strong>長榮、潤隆、海悅</strong>：航運與營建類指走強，四項條件偏多（海悅技術面轉強但未實現仍虧，宜嚴控部位）。<br /><br />
+            <strong>使用方式：</strong>點右上角「立即更新」後，每日分析報告的現價、均線、五日動能、量比與紅黃綠燈會依最新行情重算；本頁新聞列表同步換成當天頭條。<br /><br />
+            <strong>解讀順序：</strong>先看加權／費半方向，再對照台積電、ODM（廣達、技嘉、英業達）、金融與高息 ETF 的燈號（股價 vs MA20、MA20 vs MA60、近 5 日、量比）。<br /><br />
             以上為依公開資訊整理，非投資建議。
           </p>
-          <p className="mr-note" style={{ marginTop: 12, marginBottom: 0 }}>分析時間：2026/08/20</p>
+          <p className="mr-note" style={{ marginTop: 12, marginBottom: 0 }}>
+            {live ? `新聞更新日：${reportDate}` : '分析時間：2026/08/20'}
+          </p>
         </div>
       </section>
     </div>
