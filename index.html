@@ -122,6 +122,26 @@ body{font-family:Inter,Noto Sans TC,system-ui,sans-serif;background:var(--bg);co
 .detail-value.down{color:var(--green)}
 .detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 16px;margin-top:4px}
 @media(max-width:768px){.detail-grid{grid-template-columns:1fr 1fr}.holding-main{flex-direction:column;align-items:flex-start;gap:12px}.holding-right{width:100%;justify-content:space-between}}
+
+/* ===== 真實 MA 計算區塊 ===== */
+.ma-section{margin-top:14px;padding-top:12px;border-top:1px dashed var(--border)}
+.ma-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px}
+.ma-item{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:10px 12px;text-align:center}
+.ma-item.above{border-color:rgba(34,197,94,.35)}
+.ma-item.below{border-color:rgba(239,68,68,.35)}
+.ma-name{font-size:11px;color:var(--dim);letter-spacing:.04em;margin-bottom:4px}
+.ma-value{font-size:16px;font-weight:700;color:var(--text);margin-bottom:2px}
+.ma-status{font-size:12px;font-weight:600}
+.ma-item.above .ma-status{color:var(--green)}
+.ma-item.below .ma-status{color:var(--red)}
+.ma-arrangement{display:flex;align-items:center;gap:10px;margin:4px 0 2px}
+.ma-arr-badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.ma-arr-badge.bull{background:rgba(34,197,94,.15);color:var(--green)}
+.ma-arr-badge.bear{background:rgba(239,68,68,.15);color:var(--red)}
+.ma-arr-badge.side{background:rgba(234,179,8,.12);color:var(--yellow)}
+.ma-advice{display:block;margin-top:4px;line-height:1.55;color:var(--text)}
+@media(max-width:768px){.ma-grid{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
