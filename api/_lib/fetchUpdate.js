@@ -288,6 +288,56 @@ function toneOf(title) {
   return 'neutral';
 }
 
+/** 判斷標題是否以英文為主（需翻成繁中） */
+function isMostlyEnglish(text) {
+  if (!text || typeof text !== 'string') return false;
+  const s = text.replace(/\s+/g, '');
+  if (s.length < 4) return false;
+  const latin = (s.match(/[A-Za-z]/g) || []).length;
+  const cjk = (s.match(/[\u4e00-\u9fff]/g) || []).length;
+  return latin >= 8 && latin > cjk * 2;
+}
+
+async function translateToZhTw(text) {
+  if (!text || !isMostlyEnglish(text)) return text;
+  try {
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text.slice(0, 450))}&langpair=en|zh-TW`;
+    const data = await fetchJson(url, 8000);
+    const out = data?.responseData?.translatedText;
+    if (out && typeof out === 'string' && out.trim() && !/^MYMEMORY/i.test(out)) {
+      return out.trim();
+    }
+  } catch {
+    /* keep original */
+  }
+  return text;
+}
+
+/** 將英文標題翻成繁中；原文保留在 en */
+async function ensureZhTitles(items) {
+  if (!Array.isArray(items) || !items.length) return items || [];
+  const out = [];
+  for (const it of items) {
+    const raw = (it.title || '').trim();
+    if (!raw) {
+      out.push(it);
+      continue;
+    }
+    if (!isMostlyEnglish(raw)) {
+      out.push({ ...it, title: raw, tone: toneOf(raw) });
+      continue;
+    }
+    const zh = await translateToZhTw(raw);
+    out.push({
+      ...it,
+      title: zh,
+      en: it.en || raw,
+      tone: toneOf(zh + ' ' + raw),
+    });
+  }
+  return out;
+}
+
 function parseRss(xml, limit = 10) {
   const items = [];
   const re = /<item\b[\s\S]*?<\/item>/gi;
@@ -439,13 +489,22 @@ export async function fetchMarketUpdate(body = {}) {
     indexCard('tpex', '櫃買指數 TPEx', tpex?.price, tpex?.prev),
   ];
 
+  // 國際／AI 頭條：英文標題一律翻成繁體中文（原文進 en）
+  const [cnnZh, bbgZh, foxZh, aiZh, twZh] = await Promise.all([
+    ensureZhTitles(cnn || []),
+    ensureZhTitles(bloomberg || []),
+    ensureZhTitles(fox || []),
+    ensureZhTitles(aiNews || []),
+    ensureZhTitles(twNews || []),
+  ]);
+
   const quoteOk = Object.values(quotes).filter((q) => q && q.price != null).length;
   const newsCount =
-    (twNews?.length || 0) +
-    (aiNews?.length || 0) +
-    (cnn?.length || 0) +
-    (bloomberg?.length || 0) +
-    (fox?.length || 0);
+    (twZh?.length || 0) +
+    (aiZh?.length || 0) +
+    (cnnZh?.length || 0) +
+    (bbgZh?.length || 0) +
+    (foxZh?.length || 0);
 
   return {
     ok: true,
@@ -455,11 +514,11 @@ export async function fetchMarketUpdate(body = {}) {
     taiwanIndices,
     usMarkets: Array.isArray(usMarkets) ? usMarkets : [],
     news: {
-      tw: twNews || [],
-      ai: aiNews || [],
-      cnn: cnn || [],
-      bloomberg: bloomberg || [],
-      fox: fox || [],
+      tw: twZh,
+      ai: aiZh,
+      cnn: cnnZh,
+      bloomberg: bbgZh,
+      fox: foxZh,
     },
     fetched: { quotes: quoteOk, news: newsCount },
   };
