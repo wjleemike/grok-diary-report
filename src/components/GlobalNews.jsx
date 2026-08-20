@@ -52,14 +52,14 @@ export default function GlobalNews({ news, usMarkets, reportDate, live }) {
       <h1 className="main-title">國際財經頭條</h1>
       <p className="subtitle">
         {live ? `即時更新 ${reportDate || ''}`.trim() : '資料日期 2026/08/19～20'}
-        ・紅＝好消息、綠＝壞消息・點擊開原文
+        ・每則標題繁體中文・紅＝好消息、綠＝壞消息・點擊開原文
         {live ? ' ・ 來源：Google News／各大媒體 RSS' : ''}
       </p>
 
       <section className="mr-section">
         <h2 className="mr-section-title">1. 全球財經頭條（三大媒體精選）</h2>
         <p className="mr-note" style={{ marginBottom: 12 }}>
-          點擊卡片開啟原文。{live ? '標題來自即時新聞源。' : '中文下方為英文標題。'}可用右上角「立即更新」重抓。
+          點擊卡片開啟原文。每則標題皆為繁體中文；若有英文原文會顯示在下方。可用右上角「立即更新」重抓並自動翻譯。
         </p>
 
         <h3 className="mr-sub">CNN Business</h3>
