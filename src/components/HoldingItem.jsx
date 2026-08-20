@@ -108,6 +108,12 @@ export default function HoldingItem({ holding }) {
               </span>
             </div>
           </div>
+          {holding.maAdvice && (
+            <div className="detail-row">
+              <span className="detail-label">均線分析建議</span>
+              <span className="detail-value">{holding.maAdvice}</span>
+            </div>
+          )}
           {holding.note && (
             <div className="detail-row">
               <span className="detail-label">補充觀察</span>
