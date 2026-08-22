@@ -251,16 +251,31 @@ export function formatReportDate(d = new Date()) {
 
 function decodeXml(s) {
   if (!s) return '';
-  return s
-    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
-    .replace(/&/g, '&')
-    .replace(/</g, '<')
-    .replace(/>/g, '>')
-    .replace(/"/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
-    .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCharCode(parseInt(n, 16)))
-    .trim();
+  const named = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' };
+  let t = String(s).replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1');
+  t = t.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (_, ent) => {
+    const e = String(ent).toLowerCase();
+    if (e.charAt(0) === '#') {
+      const n = e.charAt(1) === 'x' ? parseInt(e.slice(2), 16) : Number(e.slice(1));
+      return Number.isFinite(n) ? String.fromCharCode(n) : ' ';
+    }
+    return named[e] != null ? named[e] : ' ';
+  });
+  return t.trim();
+}
+
+function cleanNewsText(s) {
+  let t = decodeXml(s || '');
+  t = decodeXml(t);
+  t = t.replace(/<script[\s\S]*?<\/script>/gi, ' ');
+  t = t.replace(/<style[\s\S]*?<\/style>/gi, ' ');
+  t = t.replace(/<[^>]+>/g, ' ');
+  t = t.replace(/https?:\/\/\S+/gi, ' ');
+  t = t.replace(/\b(?:href|src)\s*=\s*["']?[^"'>\s]+/gi, ' ');
+  t = t.replace(/&[a-z]+;|&#\d+;/gi, ' ');
+  t = t.replace(/\s+/g, ' ').trim();
+  if (/^(<|href=|src=)/i.test(t)) return '';
+  return t;
 }
 
 function xmlTag(block, name) {
@@ -362,7 +377,7 @@ function parseRss(xml, limit = 10) {
       published: pub ? formatLastUpdate(new Date(pub)) : fmtNewsDate(pub),
       source: tag || undefined,
       tag: tag || undefined,
-      summary: decodeXml(xmlTag(b, 'description')).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 280),
+      summary: cleanNewsText(xmlTag(b, 'description')).slice(0, 220),
       tone: toneOf(title),
     });
   }
@@ -492,7 +507,7 @@ function toAiDigestItem(it, rank) {
     category,
     title: it.title,
     en: it.en,
-    summary: it.summary || it.title,
+    summary: cleanNewsText(it.summary).slice(0, 220),
     href: it.href,
     published: it.published || it.date,
     date: it.date,

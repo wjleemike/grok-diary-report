@@ -27,6 +27,14 @@ function asList(v) {
     .filter(Boolean);
 }
 
+function safeText(s) {
+  if (!s) return '';
+  let t = String(s);
+  if (/href\s*=|news\.google\.com\/rss|<\s*a\b|<a\s/i.test(t)) return '';
+  t = t.replace(/https?:\/\/\S+/g, ' ').replace(/<|>|"|&/g, ' ');
+  return t.replace(/\s+/g, ' ').trim();
+}
+
 export default function TaiwanAINews({ news, reportDate, live }) {
   const tw = news?.tw?.length ? news.tw : twNews;
   const digest = isDigest(news?.ai) ? news.ai : AI_DIGEST;
@@ -74,8 +82,7 @@ export default function TaiwanAINews({ news, reportDate, live }) {
 
         <div className="aid-list">
           {digest.slice(0, 10).map((n, i) => {
-            const rank = n.rank || i + 1;
-            const score = n.score ?? '—';
+            const summary = safeText(n.summary);
             return (
               <article key={(n.href || '') + n.title} className={`aid-card ${n.tone || 'neutral'}`}>
                 <header className="aid-head">
@@ -97,7 +104,7 @@ export default function TaiwanAINews({ news, reportDate, live }) {
                     {n.en && <div className="news-en">{n.en}</div>}
                   </div>
                 </header>
-                {n.summary && <p className="aid-summary">{n.summary}</p>}
+                {summary && <p className="aid-summary">{summary}</p>}
                 <dl className="aid-fields">
                   {n.reason && (
                     <>
