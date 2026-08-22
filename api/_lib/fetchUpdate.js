@@ -499,7 +499,7 @@ function toAiDigestItem(it, rank) {
     source: it.source || it.tag,
     reason: `信源「${it.source || it.tag || '媒體'}」；歸類 ${category}。綜合產業影響力、時效與可追蹤性給 ${score} 分。`,
     angles: '可往競爭格局、資本開支、對台積電／伺服器鏈的訂單能見度延伸。',
-    risk: '即時 RSS 摘要可能不完整，請點來源連結核對原文與時戳。',
+    risk: ['即時 RSS 摘要可能不完整', '請點來源連結核對原文與時戳'],
     tone: it.tone || toneOf(it.title),
   };
 }

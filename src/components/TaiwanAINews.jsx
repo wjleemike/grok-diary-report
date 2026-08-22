@@ -18,6 +18,15 @@ function isDigest(items) {
   return Array.isArray(items) && items.length && (items[0].score != null || items[0].summary);
 }
 
+function asList(v) {
+  if (!v) return [];
+  if (Array.isArray(v)) return v.filter(Boolean);
+  return String(v)
+    .split(/\n|(?=\d[）)])/)
+    .map((s) => s.replace(/^\d[）)]/, '').trim())
+    .filter(Boolean);
+}
+
 export default function TaiwanAINews({ news, reportDate, live }) {
   const tw = news?.tw?.length ? news.tw : twNews;
   const digest = isDigest(news?.ai) ? news.ai : AI_DIGEST;
@@ -103,7 +112,13 @@ export default function TaiwanAINews({ news, reportDate, live }) {
                   {n.risk && (
                     <>
                       <dt>風險提示</dt>
-                      <dd>{n.risk}</dd>
+                      <dd>
+                        <ul className="aid-risk">
+                          {asList(n.risk).map((r) => (
+                            <li key={r}>{r}</li>
+                          ))}
+                        </ul>
+                      </dd>
                     </>
                   )}
                 </dl>
