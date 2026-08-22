@@ -359,7 +359,10 @@ function parseRss(xml, limit = 10) {
       title,
       href,
       date: fmtNewsDate(pub),
+      published: pub ? formatLastUpdate(new Date(pub)) : fmtNewsDate(pub),
+      source: tag || undefined,
       tag: tag || undefined,
+      summary: decodeXml(xmlTag(b, 'description')).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 280),
       tone: toneOf(title),
     });
   }
@@ -452,6 +455,92 @@ async function fetchCnnMajor() {
   return picked;
 }
 
+function aiCategory(t) {
+  const s = t || '';
+  if (/agent|harness|AVO|Codex|監督/i.test(s)) return 'Agent';
+  if (/robot|humanoid|Unitree|機器人/i.test(s)) return '機器人';
+  if (/IPO|funding|debt|unicorn|授權|融資|併購|billion/i.test(s)) return '融資併購';
+  if (/chip|GPU|TSMC|Rapidus|Rebellions|semiconductor|晶片|算力|data center|電力/i.test(s)) return '芯片與算力';
+  if (/open.?source|open.?weight|開源/i.test(s)) return '開源模型';
+  if (/regulat|export|White House|safety|監管/i.test(s)) return '監管政策';
+  if (/Siri|layoff|Apple|裁員|戰略/i.test(s)) return '科技公司戰略';
+  if (/office|Copilot|accounting|Rillet|辦公/i.test(s)) return 'AI 辦公工具';
+  if (/OpenAI|Anthropic|Google|Meta|xAI|GPT|Claude/i.test(s)) return '大模型公司';
+  if (/hardware|ASIC|TPU|硬體/i.test(s)) return 'AI 硬件';
+  return 'AI 應用';
+}
+
+function scoreAiItem(it) {
+  const t = `${it.title || ''} ${it.source || ''} ${it.tag || ''} ${it.href || ''}`;
+  let s = 42;
+  if (/Reuters|Bloomberg|WSJ|Wall Street Journal|Financial Times|The Information/i.test(t)) s += 22;
+  else if (/TechCrunch|The Verge|CNBC|Nikkei|MIT/i.test(t)) s += 14;
+  else s += 5;
+  if (/OpenAI|Nvidia|Anthropic|Google|TSMC|台積|輝達/i.test(t)) s += 12;
+  if (/IPO|billion|chip|agent|harness|debt|GPU|robot/i.test(t)) s += 10;
+  if (/layoff|裁員|circular|fatigue/i.test(t)) s += 6;
+  return Math.max(55, Math.min(97, s));
+}
+
+function toAiDigestItem(it, rank) {
+  const blob = `${it.title} ${it.en || ''} ${it.summary || ''}`;
+  const category = aiCategory(blob);
+  const score = it.score || scoreAiItem(it);
+  return {
+    rank,
+    score,
+    category,
+    title: it.title,
+    en: it.en,
+    summary: it.summary || it.title,
+    href: it.href,
+    published: it.published || it.date,
+    date: it.date,
+    source: it.source || it.tag,
+    reason: `信源「${it.source || it.tag || '媒體'}」；歸類 ${category}。綜合產業影響力、時效與可追蹤性給 ${score} 分。`,
+    angles: '可往競爭格局、資本開支、對台積電／伺服器鏈的訂單能見度延伸。',
+    risk: '即時 RSS 摘要可能不完整，請點來源連結核對原文與時戳。',
+    tone: it.tone || toneOf(it.title),
+  };
+}
+
+async function fetchAiDigest() {
+  const en = (q) => gnews(q, 'en-US', 'US', 'US:en');
+  const lists = await Promise.all([
+    fetchRss(en('site:reuters.com (OpenAI OR Nvidia OR Anthropic OR AI) when:1d'), 20).catch(() => []),
+    fetchRss(en('site:bloomberg.com (OpenAI OR Nvidia OR Anthropic OR AI) when:1d'), 20).catch(() => []),
+    fetchRss(en('site:techcrunch.com (AI OR OpenAI OR Nvidia OR agent) when:1d'), 15).catch(() => []),
+    fetchRss(en('(OpenAI OR Nvidia OR Anthropic OR "AI agent") (WSJ OR "Financial Times" OR "The Information") when:1d'), 15).catch(() => []),
+  ]);
+  const seen = new Set();
+  const merged = [];
+  for (const it of lists.flat()) {
+    const k = newsDedupeKey(it.title);
+    if (!k || seen.has(k)) continue;
+    if (/Walmart|Apple Pay|Pixel|Patreon|YouTube|Oura|sleep-track|LinkedIn.?AI slop/i.test(it.title)) continue;
+    seen.add(k);
+    merged.push({ ...it, score: scoreAiItem(it) });
+  }
+  merged.sort((a, b) => b.score - a.score);
+  const top = merged.slice(0, 10);
+  const zh = await ensureZhTitles(top);
+  const items = zh.map((it, i) => toAiDigestItem(it, i + 1));
+  const long = items[0];
+  const cats = [...new Set(items.map((x) => x.category))].slice(0, 4).join('、');
+  return {
+    items,
+    meta: {
+      longform: long
+        ? {
+            rank: long.rank,
+            title: long.title,
+            why: `本日最高分（${long.score}）。${long.reason}`,
+          }
+        : null,
+      trend: `過去 24 小時高質量信源集中在「${cats}」。立即更新後的榜單依 Reuters／Bloomberg／WSJ／TechCrunch 等加權，分數為啟發式（非人工複核）。`,
+    },
+  };
+}
 
 async function fetchUsIndices() {
   const url =
@@ -507,7 +596,7 @@ export async function fetchMarketUpdate(body = {}) {
     fetchUsIndices().catch((e) => ({ error: String(e.message || e) })),
     fetchMisPrices(wanted).catch(() => ({})),
     fetchRss(gnews('台股 OR 加權指數 OR 台積電'), 10).catch(() => []),
-    fetchRss(gnews('AI OR Nvidia OR OpenAI OR 輝達 OR 人工智慧'), 10).catch(() => []),
+    fetchAiDigest().catch(() => ({ items: [], meta: null })),
     fetchCnnMajor().catch(() => []),
     fetchRss(gnews('site:bloomberg.com (markets OR stocks OR AI)'), 10).catch(() => []),
     fetchRss(gnews('site:foxbusiness.com')).then((list) =>
@@ -524,7 +613,7 @@ export async function fetchMarketUpdate(body = {}) {
 
   const yahooPromise = fetchAllYahoo([...chartItems, { symbol: '^TWII', code: '^TWII' }]).catch(() => ({}));
 
-  const [usMarkets, mis, twNews, aiNews, cnn, bloomberg, fox, bySymbol] = await Promise.all([
+  const [usMarkets, mis, twNews, aiPack, cnn, bloomberg, fox, bySymbol] = await Promise.all([
     ...jobs,
     yahooPromise,
   ]);
@@ -567,12 +656,15 @@ export async function fetchMarketUpdate(body = {}) {
     indexCard('tpex', '櫃買指數 TPEx', tpex?.price, tpex?.prev),
   ];
 
+  const aiNews = Array.isArray(aiPack) ? aiPack : aiPack?.items || [];
+  const aiMetaIn = Array.isArray(aiPack) ? null : aiPack?.meta;
+
   // 國際／AI 頭條：英文標題一律翻成繁體中文（原文進 en）
   const [cnnZh, bbgZh, foxZh, aiZh, twZh] = await Promise.all([
     ensureZhTitles(cnn || []),
     ensureZhTitles(bloomberg || []),
     ensureZhTitles(fox || []),
-    ensureZhTitles(aiNews || []),
+    Promise.resolve(aiNews || []),
     ensureZhTitles(twNews || []),
   ]);
 
@@ -594,6 +686,7 @@ export async function fetchMarketUpdate(body = {}) {
     news: {
       tw: twZh,
       ai: aiZh,
+      aiMeta: aiMetaIn || undefined,
       cnn: cnnZh,
       bloomberg: bbgZh,
       fox: foxZh,
