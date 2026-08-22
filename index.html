@@ -8,10 +8,10 @@
 :root{--bg:#0b0f14;--card:#1a2234;--border:#2a3548;--text:#f1f5f9;--muted:#94a3b8;--dim:#64748b;--accent:#14b8a6;--green:#22c55e;--yellow:#eab308;--red:#ef4444;--reds:#f87171}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Inter,Noto Sans TC,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
-.top-nav{display:flex;gap:8px;padding:16px 24px;overflow-x:auto;border-bottom:1px solid var(--border);background:#111827}
-.nav-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9999px;font-size:13px;font-weight:500;border:none;cursor:pointer;background:#1e293b;color:var(--muted);white-space:nowrap}
+.top-nav{display:flex;align-items:center;gap:8px;padding:16px 24px;overflow-x:auto;border-bottom:1px solid var(--border);background:#111827;-webkit-overflow-scrolling:touch}
+.nav-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9999px;font-size:13px;font-weight:500;border:none;cursor:pointer;background:#1e293b;color:var(--muted);white-space:nowrap;flex:0 0 auto}
 .nav-btn.active,.nav-btn.update-btn{background:var(--accent);color:#0f172a;font-weight:600}
-.nav-btn.update-btn{margin-left:auto}
+.nav-btn.update-btn{margin-left:auto;flex-shrink:0}
 .container{max-width:1100px;margin:0 auto;padding:20px 24px 60px}
 .update-time{font-size:12px;color:var(--dim);margin-bottom:16px}
 .section-label{font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--dim);text-transform:uppercase;margin-bottom:6px}
@@ -192,8 +192,12 @@ body{font-family:Inter,Noto Sans TC,system-ui,sans-serif;background:var(--bg);co
 .aid-risk li{margin:2px 0}
 .aid-card .news-meta a{color:var(--accent)}
 @media(max-width:768px){
-  .aid-head{grid-template-columns:44px 52px 1fr;gap:8px}
-  .aid-title{font-size:16px}
+  .top-nav{flex-wrap:wrap;padding:12px;gap:8px}
+  .nav-btn{font-size:13px;padding:8px 16px;flex:0 0 auto}
+  .nav-btn.update-btn{margin-left:0}
+  .aid-head{grid-template-columns:52px 64px 1fr;gap:12px}
+  .aid-title{font-size:17px}
+  .aid-rank,.aid-score{font-size:22px}
   .aid-fields{grid-template-columns:1fr}
 }
 
