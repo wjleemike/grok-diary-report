@@ -79,10 +79,12 @@ export default function TaiwanAINews({ news, reportDate, live }) {
             return (
               <article key={(n.href || '') + n.title} className={`aid-card ${n.tone || 'neutral'}`}>
                 <header className="aid-head">
-                  <div className="aid-rank">#{rank}</div>
-                  <div className="aid-score-wrap">
-                    <div className="aid-score">{score}</div>
-                    <div className="aid-score-label">優先級</div>
+                  <div className="aid-badges">
+                    <div className="aid-rank">#{rank}</div>
+                    <div className="aid-score-wrap">
+                      <div className="aid-score">{score}</div>
+                      <div className="aid-score-label">優先級</div>
+                    </div>
                   </div>
                   <div className="aid-head-main">
                     <div className="aid-cats">
