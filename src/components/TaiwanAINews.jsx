@@ -82,6 +82,8 @@ export default function TaiwanAINews({ news, reportDate, live }) {
 
         <div className="aid-list">
           {digest.slice(0, 10).map((n, i) => {
+            const rank = n.rank || i + 1;
+            const score = n.score ?? '—';
             const summary = safeText(n.summary);
             return (
               <article key={(n.href || '') + n.title} className={`aid-card ${n.tone || 'neutral'}`}>
